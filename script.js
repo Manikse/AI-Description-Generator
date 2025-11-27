@@ -1,47 +1,49 @@
 // --- Налаштування Лічильника та Ключа ---
-const MAX_FREE_ATTEMPTS = 2; // Дозволяємо 2 безкоштовні спроби
-const MASTER_LICENSE_KEY = "AI-DESC-GEN-GMRD-B19C77-2025NOV-74A82F"; // Ваш існуючий ключ
+const MAX_FREE_ATTEMPTS = 2;
+const MASTER_LICENSE_KEY = "AI-DESC-GEN-GMRD-B19C77-2025NOV-74A82F";
 
-const outputDiv = document.getElementById('output');
-const generatorSection = document.getElementById('generator-section');
-const keyMessage = document.getElementById('key-message');
+const chatWindow = document.getElementById('chat-window');
 const keyForm = document.getElementById('key-form');
 const keyInput = document.getElementById('license-key');
+const keyMessage = document.getElementById('key-message');
 const promptInput = document.getElementById('prompt');
+const generatorForm = document.getElementById('generator-form');
 const generateButton = document.getElementById('generate-button');
 const accessSection = document.getElementById('access-section');
-const copyButton = document.getElementById('copy-button'); // Додано тут для scope
+
+
+// Функція створення елемента повідомлення
+function createMessageElement(content, senderClass) {
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('message', senderClass);
+    messageContainer.innerHTML = `<p>${content}</p>`;
+    chatWindow.appendChild(messageContainer);
+    
+    // Скрол вниз до останнього повідомлення
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    
+    return messageContainer;
+}
 
 // Функція оновлення лічильника
 function updateCounter() {
     let attempts = parseInt(localStorage.getItem('free_attempts') || '0');
     let remaining = MAX_FREE_ATTEMPTS - attempts;
     
-    // Якщо активовано ключем, не показуємо лічильник
     if (localStorage.getItem('license_activated') === 'true') {
-        // Оновлено: використовуємо англійську
-        accessSection.innerHTML = '<p style="color: green;">✅ Full Access Activated (Subscription Key).</p>';
+        accessSection.innerHTML = '<p style="color: green; font-weight: bold;">✅ Full Access Activated (Subscription Key).</p>';
     } else if (remaining > 0) {
-        // Оновлено: використовуємо англійську
-        accessSection.innerHTML = `<p>👉 Try ${remaining} generation(s) for free. Get full access below.</p>`;
+        accessSection.innerHTML = `<p>👉 **Free Trial:** ${remaining} generation(s) remaining. Get full access below.</p>`;
     } else {
-        // Оновлено: використовуємо англійську
-        accessSection.innerHTML = `<p style="color: red;">❌ Free trials used up. Please activate your subscription key below!</p>`;
-        generatorSection.style.display = 'none';
+        accessSection.innerHTML = `<p style="color: red; font-weight: bold;">❌ Free trials used up. Activate your subscription key below!</p>`;
+        generatorForm.style.pointerEvents = 'none'; // Блокуємо форму вводу
+        generateButton.disabled = true;
     }
 }
 
-// Перевірка активації при завантаженні
-if (localStorage.getItem('license_activated') === 'true' || 
-    parseInt(localStorage.getItem('free_attempts') || '0') < MAX_FREE_ATTEMPTS) {
-    generatorSection.style.display = 'block';
-} else {
-    generatorSection.style.display = 'none';
-}
+// --- Ініціалізація та Логіка Активації ---
+
 updateCounter();
-
-
-// --- Логіка Активації Ключа ---
 
 keyForm.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -49,10 +51,11 @@ keyForm.addEventListener('submit', function(e) {
 
     if (inputKey === MASTER_LICENSE_KEY) {
         localStorage.setItem('license_activated', 'true');
-        generatorSection.style.display = 'block';
         keyMessage.textContent = '✅ Activated! You have full access.';
         keyMessage.style.color = 'green';
-        keyForm.style.display = 'none'; // Ховаємо форму ключа
+        keyForm.style.display = 'none';
+        generatorForm.style.pointerEvents = 'auto'; // Розблоковуємо
+        generateButton.disabled = false;
         updateCounter();
     } else {
         keyMessage.textContent = '❌ Invalid subscription key. Please check and try again.';
@@ -61,27 +64,31 @@ keyForm.addEventListener('submit', function(e) {
 });
 
 
-// --- Логіка Генерації Тексту та Лічильник ---
+// --- Логіка Генерації Чат-Повідомлення ---
 
-document.getElementById('generator-form').addEventListener('submit', async (e) => {
+generatorForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const prompt = promptInput.value.trim();
+    if (!prompt) return;
 
+    // 1. Перевірка доступу
     const isActivated = localStorage.getItem('license_activated') === 'true';
     let attempts = parseInt(localStorage.getItem('free_attempts') || '0');
 
     if (!isActivated && attempts >= MAX_FREE_ATTEMPTS) {
-        outputDiv.innerHTML = `<p style="color: red;">Subscription required. You have used ${MAX_FREE_ATTEMPTS} free generations.</p>`;
-        generatorSection.style.display = 'none';
+        createMessageElement(`Subscription required. You have used ${MAX_FREE_ATTEMPTS} free generations.`, 'system-message error');
         updateCounter();
         return;
     }
     
-    const prompt = promptInput.value;
+    // 2. Відображення запиту користувача
+    createMessageElement(prompt, 'user-message');
+    promptInput.value = ''; // Очищаємо інпут
 
-    // Оновлено: використовуємо англійську
-    outputDiv.innerHTML = '<p>🚀 Generating copy, please wait...</p>'; 
+    // 3. Індикатор завантаження
+    const loadingMessage = createMessageElement('<span class="loading-dots">Generating...</span>', 'ai-message');
+    
     generateButton.disabled = true;
-    copyButton.style.display = 'none';
 
     try {
         const response = await fetch('/.netlify/functions/generate-text', {
@@ -93,21 +100,23 @@ document.getElementById('generator-form').addEventListener('submit', async (e) =
         const data = await response.json();
 
         if (!response.ok) {
-            // Оновлено: використовуємо англійську
             throw new Error(data.error || 'Server generation error.');
         }
 
+        // 4. Оновлення лічильника
         if (!isActivated) {
             attempts++;
             localStorage.setItem('free_attempts', attempts.toString());
         }
 
-        outputDiv.textContent = data.text;
-        copyButton.style.display = 'block';
+        // 5. Заміна індикатора на результат
+        loadingMessage.innerHTML = `<p>${data.text}</p><button class="copy-btn">Copy</button>`;
+        loadingMessage.classList.add('ai-message');
         
     } catch (error) {
-        // Оновлено: використовуємо англійську
-        outputDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}. Please try again or check API key.</p>`; 
+        // Виведення помилки у вікно чату
+        loadingMessage.innerHTML = `<p style="color: red;">❌ Error: ${error.message}. Please check API key.</p>`;
+        loadingMessage.classList.add('error');
         console.error('Fetch error:', error);
     } finally {
         generateButton.disabled = false;
@@ -115,12 +124,14 @@ document.getElementById('generator-form').addEventListener('submit', async (e) =
     }
 });
 
-// Логіка копіювання
-document.getElementById('copy-button').addEventListener('click', () => {
-    const textToCopy = document.getElementById('output').textContent;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('Text copied successfully!');
-    }).catch(err => {
-        console.error('Could not copy text: ', err);
-    });
+// --- Логіка Копіювання (Делегування) ---
+chatWindow.addEventListener('click', (e) => {
+    if (e.target.classList.contains('copy-btn')) {
+        const textToCopy = e.target.parentElement.querySelector('p').textContent;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('Text copied successfully!');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+    }
 });

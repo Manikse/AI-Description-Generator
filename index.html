@@ -3,56 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Description Generator (MVP)</title>
+    <title>AI Description Chatbot</title>
     
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
     <header>
-        <h1>✍️ AI Description Generator</h1>
-        <p>Quickly generate unique marketing copy for your products and content in **any language**.</p>
+        <h1>💬 AI Copywriter Chatbot</h1>
     </header>
     
-    <hr>
-
-    <section id="access-section">
-        <h2>Unlock Full Access</h2>
-        <p>Try 2 generations for free. Unlock unlimited use with a monthly subscription.</p> 
-        
-        <a href="https://gum.co/YOUR_PRODUCT_ID" target="_blank" class="gumroad-button">
-            Subscribe Now (€9/Month)
-        </a>
-    </section>
-
-    <hr>
-    
-    <section id="generator-access">
-        <h2>Activation</h2>
-        <form id="key-form">
-            <label for="license-key">Enter your License Key:</label>
-            <input type="text" id="license-key" required placeholder="Your unique key from Gumroad">
-            <button type="submit">Activate</button>
-        </form>
-        <p id="key-message"></p>
-    </section>
-
-    <section id="generator-section" style="display: none;">
-        <h2>Generate Your Text</h2>
-        <form id="generator-form">
-            <label for="prompt">Enter your Request (Specify the language in your prompt):</label>
-            <textarea id="prompt" required placeholder="Example: 'A short, persuasive description for a new eco-friendly backpack.' (English) OR 'Короткий опис нового енергетичного напою.' (Ukrainian)"></textarea>
-            <button type="submit" id="generate-button">Generate Description</button>
-        </form>
-    </section>
-
-    <section>
-        <h3>Generation Result</h3>
-        <div id="output">
-            <p>Your generated text will appear here.</p>
+    <section class="access-area">
+        <div id="access-section">
+            <p>Try 2 generations for free. Unlock unlimited use with a monthly subscription.</p> 
+            <a href="https://manikse.gumroad.com/l/dvkny" target="_blank" class="gumroad-button">
+                Subscribe Now (€9/Month)
+            </a>
         </div>
-        <button id="copy-button" style="display: none; margin-top: 10px;">Copy Text</button>
+
+        <div id="generator-access">
+            <form id="key-form">
+                <input type="text" id="license-key" required placeholder="Enter Subscription Key">
+                <button type="submit">Activate</button>
+            </form>
+            <p id="key-message" style="margin-top: 5px;"></p>
+        </div>
+        <hr>
     </section>
+
+    <main id="chat-container">
+        <div id="chat-window">
+            <div class="message system-message">
+                <p>Welcome! I'm your AI Copywriter. Tell me what product or content description you need.</p>
+                <p>💡 **Tip:** Ask in any language! (e.g., "Write a Twitter thread about remote work efficiency.")</p>
+            </div>
+            </div>
+
+        <form id="generator-form">
+            <textarea id="prompt" required placeholder="Type your request here..."></textarea>
+            <button type="submit" id="generate-button">Send</button>
+        </form>
+    </main>
 
     <script src="script.js"></script>
 </body>

@@ -1,10 +1,20 @@
 /* --- Змінні та Базові Налаштування --- */
 :root {
-    --primary-color: #007bff; /* Яскраво-синій для кнопок */
-    --background-dark: #1e1e1e; /* Темний фон */
-    --text-light: #f0f0f0; /* Світлий текст */
-    --card-background: #252526; /* Фон для блоків/карт */
-    --border-color: #444; /* Колір тонких ліній */
+    --primary-color: #6a11cb; /* Глибокий фіолетовий */
+    --secondary-color: #2575fc; /* Яскраво-синій */
+    --background-dark: #121212; /* Дуже темний фон */
+    --text-light: #e0e0e0; /* Світліший текст */
+    --card-background: #1e1e1e; /* Темний фон для блоків */
+    --border-color: #333; /* Колір тонких ліній */
+    --gradient-start: #6a11cb; /* Градієнт для кнопок/акцентів */
+    --gradient-end: #2575fc;
+
+    /* Кольори для чату */
+    --user-bubble: #2575fc; /* Синій для користувача */
+    --ai-bubble: #333333; /* Темно-сірий для бота */
+    --system-bubble: #444444; /* Темніший сірий для системних повідомлень */
+    --error-color: #ff5555; /* Колір помилок */
+    --success-color: #4CAF50; /* Колір успіху */
 }
 
 /* --- Загальний Скид та Фон --- */
@@ -16,100 +26,299 @@ body {
     margin: 40px auto;
     padding: 20px;
     line-height: 1.6;
-    border-radius: 8px;
+    border-radius: 12px; /* Трохи більший радіус */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7); /* Видима тінь для всієї сторінки */
 }
 
 /* --- Типографія --- */
-h1, h2, h3 {
+h1 {
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 0;
+    border-bottom: none; /* Прибираємо лінію під H1 */
+    background: -webkit-linear-gradient(left, var(--gradient-start), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.8em;
+    font-weight: 800;
+}
+
+h1 .emoji {
+    filter: grayscale(0.2); /* Легкий ефект для емодзі */
+}
+
+h2, h3 {
     color: var(--primary-color);
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     margin-top: 30px;
 }
 
-/* --- Форма та Інпути --- */
-form {
-    background-color: var(--card-background);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    margin-bottom: 30px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-}
-
-textarea, input[type="text"] {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: #333;
-    color: var(--text-light);
-    box-sizing: border-box;
-}
-
-/* --- Кнопки --- */
-button {
-    padding: 12px 25px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-
-button:hover:not(:disabled) {
-    background-color: #0056b3;
-}
-
-button:disabled {
-    background-color: #444;
-    cursor: not-allowed;
-}
-
-/* --- Блок Виводу Результату --- */
-#output {
-    min-height: 100px;
-    padding: 20px;
-    background-color: var(--card-background);
-    border: 1px dashed var(--border-color);
-    border-radius: 8px;
-    white-space: pre-wrap;
-    font-size: 1.1em;
-    margin-bottom: 20px;
-}
-
-#output p {
-    margin: 0;
-}
-
-/* --- Кнопка Gumroad та Роздільник --- */
-.gumroad-button {
-    background-color: #e51d6c; /* Фірмовий колір Gumroad */
-    color: white;
-    padding: 12px 25px;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
-    display: inline-block;
-    margin-top: 10px;
-    transition: background-color 0.2s;
-}
-
-.gumroad-button:hover {
-    background-color: #b01552;
-}
-
+/* --- Горизонтальна Лінія --- */
 hr {
     border: 0;
     height: 1px;
-    background-color: var(--border-color);
+    background-image: linear-gradient(to right, transparent, var(--border-color), transparent); /* Градієнтна лінія */
     margin: 40px 0;
+}
+
+/* --- Елементи Форми (Input, Textarea) - Оновлено --- */
+textarea, input[type="text"] {
+    width: calc(100% - 22px); /* Скореговано для padding + border */
+    padding: 12px; /* Більший padding */
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px; /* Більший радіус */
+    background-color: #282828; /* Темніший фон */
+    color: var(--text-light);
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 1em;
+}
+
+textarea:focus, input[type="text"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color), 0.3); /* Ефект світіння при фокусі */
+    outline: none;
+}
+
+/* --- Кнопки - Оновлено --- */
+button {
+    padding: 12px 25px;
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end)); /* Градієнт */
+    color: white;
+    border: none;
+    border-radius: 6px; /* Більший радіус */
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease; /* Плавніший перехід */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Тінь для кнопок */
+}
+
+button:hover:not(:disabled) {
+    background: linear-gradient(to right, var(--gradient-end), var(--gradient-start)); /* Зміна градієнту при наведенні */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px); /* Ефект підняття */
+}
+
+button:disabled {
+    background: #444;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* --- Кнопка Gumroad - Оновлено --- */
+.gumroad-button {
+    background: linear-gradient(to right, #e51d6c, #ff4e5e); /* Градієнт Gumroad */
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.gumroad-button:hover {
+    background: linear-gradient(to right, #ff4e5e, #e51d6c);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+/* --- Секція Доступу/Активації - Оновлено --- */
+.access-area {
+    background-color: var(--card-background);
+    padding: 20px;
+    border-radius: 10px; /* Трохи більший радіус */
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Тінь */
+}
+#access-section p {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    line-height: 1.4;
+}
+#access-section p strong {
+    color: var(--primary-color);
+}
+
+/* Форма ключа */
+#key-form {
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    margin-top: 15px; /* Відступ зверху */
+}
+#license-key {
+    flex-grow: 1;
+    margin-bottom: 0; /* Прибираємо зайвий відступ */
+    background-color: #222; /* Темніший фон */
+}
+#key-message {
+    font-size: 0.9em;
+    margin-top: 10px;
+    padding-left: 5px; /* Відступ для тексту повідомлення */
+}
+
+/* ------------------------------------- */
+/* --- СТИЛІ ЧАТ-БОТА - Оновлено --- */
+/* ------------------------------------- */
+
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 70vh; 
+    background-color: var(--card-background);
+    border-radius: 12px; /* Більший радіус */
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); /* Видиміша тінь */
+}
+
+/* --- Вікно Історії Чату --- */
+#chat-window {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    scroll-behavior: smooth;
+    background-color: #1a1a1a; /* Темніший фон для вікна чату */
+    border-bottom: 1px solid var(--border-color); /* Роздільник */
+}
+
+/* --- Контейнер Вводу --- */
+#generator-form {
+    display: flex;
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+    background-color: #222222; /* Темніший фон */
+    margin-bottom: 0;
+    box-shadow: none;
+    border-radius: 0 0 12px 12px; /* Радіус для нижніх кутів */
+}
+
+#prompt {
+    flex-grow: 1;
+    height: 48px; /* Більша висота для зручності */
+    margin-bottom: 0;
+    resize: none;
+    border-radius: 6px;
+    background-color: #333333; /* Темніший фон */
+    color: var(--text-light);
+    border-color: #555;
+    align-self: center; /* Вирівнювання по центру */
+}
+
+#generator-form button {
+    margin-left: 10px;
+    width: 120px; /* Ширша кнопка */
+    padding: 12px 15px;
+    align-self: center; /* Вирівнювання по центру */
+}
+
+/* --- Стилі Повідомлень (Чат-бульбашки) - Оновлено --- */
+
+.message {
+    display: flex;
+    margin-bottom: 15px;
+    max-width: 85%;
+    animation: fadeIn 0.5s ease-out; /* Анімація появи повідомлень */
+}
+
+.message p {
+    padding: 12px 18px;
+    border-radius: 18px;
+    line-height: 1.5;
+    margin: 0;
+    white-space: pre-wrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Тінь для бульбашок */
+}
+
+/* Повідомлення Користувача (Праворуч) */
+.user-message {
+    margin-left: auto;
+}
+.user-message p {
+    background-color: var(--user-bubble);
+    color: white;
+    border-bottom-right-radius: 6px; /* Більш м'який зріз */
+}
+
+/* Повідомлення AI (Ліворуч) */
+.ai-message {
+    margin-right: auto;
+}
+.ai-message p {
+    background-color: var(--ai-bubble);
+    color: var(--text-light);
+    border-bottom-left-radius: 6px; /* Більш м'який зріз */
+}
+
+/* Системні повідомлення - Оновлено */
+.message.system-message {
+    max-width: 90%;
+    margin: 15px auto; /* Центруємо системні повідомлення */
+    text-align: center;
+    color: #bbb; /* Світліший колір */
+    font-size: 0.95em;
+    background-color: rgba(var(--primary-color), 0.1); /* Легкий фон */
+    border-radius: 8px;
+    padding: 10px 15px;
+    box-shadow: none;
+}
+.message.system-message p {
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.message.system-message.error {
+    color: var(--error-color);
+    font-weight: bold;
+    background-color: rgba(var(--error-color), 0.1);
+}
+.message.system-message.success {
+    color: var(--success-color);
+    font-weight: bold;
+    background-color: rgba(var(--success-color), 0.1);
+}
+
+/* Кнопка Копіювання всередині AI-повідомлення - Оновлено */
+.copy-btn {
+    background-color: #555;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.85em;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-block; /* Виводимо як inline-block */
+    float: right; /* Позиціонуємо праворуч */
+    transition: background-color 0.2s;
+}
+.copy-btn:hover {
+    background-color: #777;
+}
+
+/* Індикатор Завантаження */
+.loading-dots {
+    display: inline-block; /* Щоб анімація працювала добре */
+}
+.loading-dots:after {
+    content: ' .';
+    animation: dots 1s steps(5, end) infinite;
+}
+@keyframes dots {
+    to { content: ' ...'; }
+}
+
+/* Анімація появи повідомлення */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
