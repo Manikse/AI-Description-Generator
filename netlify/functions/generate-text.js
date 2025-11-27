@@ -2,7 +2,7 @@
 
 // const fetch = require('node-fetch'); 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/completions'; 
-const MODEL = "openai/gpt-3.5-turbo-instruct"; 
+const MODEL = "openai/gpt-3.5-turbo"; 
 
 exports.handler = async (event) => {
     if (event.httpMethod !== 'POST' || !event.body) {
