@@ -1,0 +1,115 @@
+/* --- Змінні та Базові Налаштування --- */
+:root {
+    --primary-color: #007bff; /* Яскраво-синій для кнопок */
+    --background-dark: #1e1e1e; /* Темний фон */
+    --text-light: #f0f0f0; /* Світлий текст */
+    --card-background: #252526; /* Фон для блоків/карт */
+    --border-color: #444; /* Колір тонких ліній */
+}
+
+/* --- Загальний Скид та Фон --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    border-radius: 8px;
+}
+
+/* --- Типографія --- */
+h1, h2, h3 {
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+
+/* --- Форма та Інпути --- */
+form {
+    background-color: var(--card-background);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+textarea, input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: #333;
+    color: var(--text-light);
+    box-sizing: border-box;
+}
+
+/* --- Кнопки --- */
+button {
+    padding: 12px 25px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+}
+
+/* --- Блок Виводу Результату --- */
+#output {
+    min-height: 100px;
+    padding: 20px;
+    background-color: var(--card-background);
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+#output p {
+    margin: 0;
+}
+
+/* --- Кнопка Gumroad та Роздільник --- */
+.gumroad-button {
+    background-color: #e51d6c; /* Фірмовий колір Gumroad */
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.gumroad-button:hover {
+    background-color: #b01552;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 40px 0;
+}
