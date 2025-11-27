@@ -1,24 +1,17 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Генератор Описів (MVP)</title>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
-        textarea { width: 100%; height: 100px; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        #output { border: 1px solid #eee; padding: 15px; background-color: #f9f9f9; margin-top: 20px; white-space: pre-wrap; }
-        .gumroad-button { background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 10px; }
-        .gumroad-button:hover { background-color: #0056b3; }
-    </style>
-    <link rel="stylesheet" href="style.css">
+    <title>AI Description Generator (MVP)</title>
+    
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
     <header>
-        <h1>✍️ AI Генератор Описів</h1>
-        <p>Швидко генеруйте унікальні тексти для ваших продуктів чи контенту.</p>
+        <h1>✍️ AI Description Generator</h1>
+        <p>Quickly generate unique marketing copy for your products and content in **any language**.</p>
     </header>
     
     <hr>
@@ -27,7 +20,7 @@
         <h2>Unlock Full Access</h2>
         <p>Try 2 generations for free. Unlock unlimited use with a monthly subscription.</p> 
         
-        <a href="https://manikse.gumroad.com/l/dvkny" target="_blank" class="gumroad-button">
+        <a href="https://gum.co/YOUR_PRODUCT_ID" target="_blank" class="gumroad-button">
             Subscribe Now (€9/Month)
         </a>
     </section>
@@ -35,30 +28,30 @@
     <hr>
     
     <section id="generator-access">
-        <h2>Активація Генератора</h2>
+        <h2>Activation</h2>
         <form id="key-form">
-            <label for="license-key">Введіть ваш Ліцензійний Ключ:</label>
-            <input type="text" id="license-key" required placeholder="Ваш унікальний ключ від Gumroad">
-            <button type="submit">Активувати</button>
+            <label for="license-key">Enter your License Key:</label>
+            <input type="text" id="license-key" required placeholder="Your unique key from Gumroad">
+            <button type="submit">Activate</button>
         </form>
         <p id="key-message"></p>
     </section>
 
     <section id="generator-section" style="display: none;">
-        <h2>Генерація Тексту</h2>
+        <h2>Generate Your Text</h2>
         <form id="generator-form">
-            <label for="prompt">Введіть запит (Тема, продукт, стиль):</label>
-            <textarea id="prompt" required placeholder="Наприклад: 'короткий, переконливий опис для нового екологічного рюкзака'"></textarea>
-            <button type="submit" id="generate-button">Згенерувати Опис</button>
+            <label for="prompt">Enter your Request (Specify the language in your prompt):</label>
+            <textarea id="prompt" required placeholder="Example: 'A short, persuasive description for a new eco-friendly backpack.' (English) OR 'Короткий опис нового енергетичного напою.' (Ukrainian)"></textarea>
+            <button type="submit" id="generate-button">Generate Description</button>
         </form>
     </section>
 
     <section>
-        <h3>Результат Генерації</h3>
+        <h3>Generation Result</h3>
         <div id="output">
-            <p>Натисніть "Згенерувати Опис" після активації.</p>
+            <p>Your generated text will appear here.</p>
         </div>
-        <button id="copy-button" style="display: none; margin-top: 10px;">Копіювати Текст</button>
+        <button id="copy-button" style="display: none; margin-top: 10px;">Copy Text</button>
     </section>
 
     <script src="script.js"></script>

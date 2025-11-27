@@ -1,8 +1,8 @@
 // netlify/functions/generate-text.js
 
-// const fetch = require('node-fetch'); // Розкоментуйте, якщо потрібно
+// const fetch = require('node-fetch'); 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/completions'; 
-const MODEL = "openai/gpt-3.5-turbo-instruct"; // Або "mistralai/mistral-7b-instruct" для більш дешевої моделі
+const MODEL = "openai/gpt-3.5-turbo-instruct"; 
 
 exports.handler = async (event) => {
     if (event.httpMethod !== 'POST' || !event.body) {
@@ -11,7 +11,7 @@ exports.handler = async (event) => {
 
     try {
         const { prompt } = JSON.parse(event.body);
-        const apiKey = process.env.OPENROUTER_API_KEY; // Ваш ключ OpenRouter з Netlify
+        const apiKey = process.env.OPENROUTER_API_KEY; 
 
         if (!apiKey) {
             return {
@@ -20,10 +20,9 @@ exports.handler = async (event) => {
             };
         }
 
-        // Створюємо інструкцію для моделі
-        const system_prompt = "You are a professional marketing copywriter. Write a compelling and short product description.";
+        // ОНОВЛЕНО: Інструкція AI відповідати тією ж мовою, що й запит користувача
+        const system_prompt = "You are a professional marketing copywriter. Write a compelling and short product description. **CRITICAL: Respond in the same language as the user's request.**";
         
-        // Комбінуємо системну інструкцію та запит користувача
         const fullPrompt = `${system_prompt}\n\nUser Request: ${prompt}`;
 
         const openaiResponse = await fetch(OPENROUTER_API_URL, {
@@ -34,13 +33,10 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({
                 model: MODEL,
-                
-                // ВИПРАВЛЕНО: Використовуємо поле 'prompt' для Completion моделей
                 prompt: fullPrompt,
-                
                 max_tokens: 400,
                 temperature: 0.7,
-                stop: ["\n\n"], // Додаємо, щоб модель не генерувала зайвого
+                stop: ["\n\n"],
             }),
         });
 
@@ -51,8 +47,7 @@ exports.handler = async (event) => {
             throw new Error(openaiData.error?.message || 'OpenRouter API returned an error.');
         }
 
-        // Отримання згенерованого тексту з об'єкта 'choices' (для Completion)
-        const generatedText = openaiData.choices[0].text.trim(); // <-- Змінено на '.text'
+        const generatedText = openaiData.choices[0].text.trim();
         
         return {
             statusCode: 200,

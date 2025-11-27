@@ -10,6 +10,7 @@ const keyInput = document.getElementById('license-key');
 const promptInput = document.getElementById('prompt');
 const generateButton = document.getElementById('generate-button');
 const accessSection = document.getElementById('access-section');
+const copyButton = document.getElementById('copy-button'); // Додано тут для scope
 
 // Функція оновлення лічильника
 function updateCounter() {
@@ -18,12 +19,13 @@ function updateCounter() {
     
     // Якщо активовано ключем, не показуємо лічильник
     if (localStorage.getItem('license_activated') === 'true') {
+        // Оновлено: використовуємо англійську
         accessSection.innerHTML = '<p style="color: green;">✅ Full Access Activated (Subscription Key).</p>';
     } else if (remaining > 0) {
-        // Якщо залишилися спроби
+        // Оновлено: використовуємо англійську
         accessSection.innerHTML = `<p>👉 Try ${remaining} generation(s) for free. Get full access below.</p>`;
     } else {
-        // Якщо спроби закінчилися
+        // Оновлено: використовуємо англійську
         accessSection.innerHTML = `<p style="color: red;">❌ Free trials used up. Please activate your subscription key below!</p>`;
         generatorSection.style.display = 'none';
     }
@@ -51,7 +53,7 @@ keyForm.addEventListener('submit', function(e) {
         keyMessage.textContent = '✅ Activated! You have full access.';
         keyMessage.style.color = 'green';
         keyForm.style.display = 'none'; // Ховаємо форму ключа
-        updateCounter(); // Оновлюємо статус доступу
+        updateCounter();
     } else {
         keyMessage.textContent = '❌ Invalid subscription key. Please check and try again.';
         keyMessage.style.color = 'red';
@@ -64,23 +66,20 @@ keyForm.addEventListener('submit', function(e) {
 document.getElementById('generator-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // 1. Перевірка доступу перед генерацією
     const isActivated = localStorage.getItem('license_activated') === 'true';
     let attempts = parseInt(localStorage.getItem('free_attempts') || '0');
 
     if (!isActivated && attempts >= MAX_FREE_ATTEMPTS) {
         outputDiv.innerHTML = `<p style="color: red;">Subscription required. You have used ${MAX_FREE_ATTEMPTS} free generations.</p>`;
-        generatorSection.style.display = 'none'; // Ховаємо, щоб користувач ввів ключ
+        generatorSection.style.display = 'none';
         updateCounter();
         return;
     }
     
-    // ... (решта вашого коду генерації)
-    
     const prompt = promptInput.value;
-    const copyButton = document.getElementById('copy-button');
 
-    outputDiv.innerHTML = '<p>🚀 Generating copy, please wait...</p>';
+    // Оновлено: використовуємо англійську
+    outputDiv.innerHTML = '<p>🚀 Generating copy, please wait...</p>'; 
     generateButton.disabled = true;
     copyButton.style.display = 'none';
 
@@ -94,10 +93,10 @@ document.getElementById('generator-form').addEventListener('submit', async (e) =
         const data = await response.json();
 
         if (!response.ok) {
+            // Оновлено: використовуємо англійську
             throw new Error(data.error || 'Server generation error.');
         }
 
-        // 2. ЗБІЛЬШУЄМО ЛІЧИЛЬНИК ТІЛЬКИ ПІСЛЯ УСПІШНОЇ ГЕНЕРАЦІЇ
         if (!isActivated) {
             attempts++;
             localStorage.setItem('free_attempts', attempts.toString());
@@ -107,19 +106,20 @@ document.getElementById('generator-form').addEventListener('submit', async (e) =
         copyButton.style.display = 'block';
         
     } catch (error) {
-        outputDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}. Try again.</p>`;
+        // Оновлено: використовуємо англійську
+        outputDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}. Please try again or check API key.</p>`; 
         console.error('Fetch error:', error);
     } finally {
         generateButton.disabled = false;
-        updateCounter(); // Оновлюємо лічильник для відображення змін
+        updateCounter();
     }
 });
 
-// Логіка копіювання залишається незмінною
+// Логіка копіювання
 document.getElementById('copy-button').addEventListener('click', () => {
     const textToCopy = document.getElementById('output').textContent;
     navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('Text copied!');
+        alert('Text copied successfully!');
     }).catch(err => {
         console.error('Could not copy text: ', err);
     });
