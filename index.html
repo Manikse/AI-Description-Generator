@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Генератор Описів (MVP)</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        textarea { width: 100%; height: 100px; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        #output { border: 1px solid #eee; padding: 15px; background-color: #f9f9f9; margin-top: 20px; white-space: pre-wrap; }
+        .gumroad-button { background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 10px; }
+        .gumroad-button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>✍️ AI Генератор Описів</h1>
+        <p>Швидко генеруйте унікальні тексти для ваших продуктів чи контенту.</p>
+    </header>
+    
+    <hr>
+
+    <section id="access-section">
+        <h2>Отримайте Доступ</h2>
+        <p>Ціна: 9–15€. Придбайте ліцензійний ключ, щоб розблокувати генератор.</p>
+        
+        <a href="https://gum.co/YOUR_PRODUCT_ID" target="_blank" class="gumroad-button">
+            Купити Ліцензійний Ключ (9–15€)
+        </a>
+    </section>
+
+    <hr>
+    
+    <section id="generator-access">
+        <h2>Активація Генератора</h2>
+        <form id="key-form">
+            <label for="license-key">Введіть ваш Ліцензійний Ключ:</label>
+            <input type="text" id="license-key" required placeholder="Ваш унікальний ключ від Gumroad">
+            <button type="submit">Активувати</button>
+        </form>
+        <p id="key-message"></p>
+    </section>
+
+    <section id="generator-section" style="display: none;">
+        <h2>Генерація Тексту</h2>
+        <form id="generator-form">
+            <label for="prompt">Введіть запит (Тема, продукт, стиль):</label>
+            <textarea id="prompt" required placeholder="Наприклад: 'короткий, переконливий опис для нового екологічного рюкзака'"></textarea>
+            <button type="submit" id="generate-button">Згенерувати Опис</button>
+        </form>
+    </section>
+
+    <section>
+        <h3>Результат Генерації</h3>
+        <div id="output">
+            <p>Натисніть "Згенерувати Опис" після активації.</p>
+        </div>
+        <button id="copy-button" style="display: none; margin-top: 10px;">Копіювати Текст</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
