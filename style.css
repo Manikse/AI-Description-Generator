@@ -260,20 +260,15 @@ button:disabled {
 
 /* Системні повідомлення - Оновлено */
 .message.system-message {
-    max-width: 90%;
-    margin: 15px auto; /* Центруємо системні повідомлення */
-    text-align: center;
-    color: #bbb; /* Світліший колір */
-    font-size: 0.95em;
-    background-color: rgba(var(--primary-color), 0.1); /* Легкий фон */
-    border-radius: 8px;
-    padding: 10px 15px;
-    box-shadow: none;
+    max-width: 95%; /* Трохи менше 100% для відступів */
+    text-align: left; /* Вирівнюємо ліворуч, як у справжньому чаті */
 }
+
 .message.system-message p {
     background: none;
     padding: 0;
     margin: 0;
+    width: 100%;
 }
 
 .message.system-message.error {

@@ -103,20 +103,32 @@ generatorForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Server generation error.');
         }
 
-        // 4. Оновлення лічильника
+        // *****************************************************************
+        // ВИПРАВЛЕННЯ: Перевіряємо, чи повернувся текст
+        // *****************************************************************
+        const generatedText = data.text || "Sorry, the AI did not return any text. Please try a different prompt.";
+        
+        // 4. Оновлення лічильника (ТІЛЬКИ при успіху)
         if (!isActivated) {
             attempts++;
             localStorage.setItem('free_attempts', attempts.toString());
         }
 
         // 5. Заміна індикатора на результат
-        loadingMessage.innerHTML = `<p>${data.text}</p><button class="copy-btn">Copy</button>`;
+        loadingMessage.innerHTML = `<p>${generatedText}</p><button class="copy-btn">Copy</button>`;
         loadingMessage.classList.add('ai-message');
         
     } catch (error) {
-        // Виведення помилки у вікно чату
-        loadingMessage.innerHTML = `<p style="color: red;">❌ Error: ${error.message}. Please check API key.</p>`;
-        loadingMessage.classList.add('error');
+        // *****************************************************************
+        // ВИПРАВЛЕННЯ: Виведення помилки як системного повідомлення
+        // *****************************************************************
+        // Спочатку видаляємо клас 'ai-message', щоб не виглядав як бульбашка
+        loadingMessage.classList.remove('ai-message'); 
+        
+        // Встановлюємо вміст і класи для системної помилки
+        loadingMessage.innerHTML = `<p>❌ Error: ${error.message}. Please check API key and try again.</p>`;
+        loadingMessage.classList.add('system-message', 'error');
+        
         console.error('Fetch error:', error);
     } finally {
         generateButton.disabled = false;
@@ -127,11 +139,15 @@ generatorForm.addEventListener('submit', async (e) => {
 // --- Логіка Копіювання (Делегування) ---
 chatWindow.addEventListener('click', (e) => {
     if (e.target.classList.contains('copy-btn')) {
+        // ВИПРАВЛЕННЯ: Копіюємо текст лише з елемента <p>
         const textToCopy = e.target.parentElement.querySelector('p').textContent;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            alert('Text copied successfully!');
-        }).catch(err => {
-            console.error('Could not copy text: ', err);
-        });
+        
+        if (textToCopy.trim().length > 0) { // Перевірка на порожній текст
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('Text copied successfully!');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
     }
 });
