@@ -1,2 +1,2 @@
-# AI-Description-Generator
+# Kairos AI
 AI Description Generator
