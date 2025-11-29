@@ -148,7 +148,6 @@ generatorForm.addEventListener('submit', async (e) => {
     promptInput.value = '';
 
     // 3. Індикатор завантаження
-    // Використовуємо finalSenderClass для стилізації індикатора
     const loadingMessage = createMessageElement(`<span class="loading-dots">Generating...</span>`, finalSenderClass, true); 
     
     generateButton.disabled = true;
@@ -177,15 +176,12 @@ generatorForm.addEventListener('submit', async (e) => {
         // 5. Заміна індикатора на результат
         loadingMessage.innerHTML = `<p>${generatedText}</p><button class="copy-btn">Copy</button>`;
 
-        // Зберігаємо фінальну відповідь AI в історію, використовуючи modeClass
-        // saveMessage викликається через createMessageElement, але ми вже використали loadingMessage
-        // Тому просто переконуємося, що зберігаємо правильний клас
-        // Оскільки ми використовували loadingMessage для відображення, ми зберігаємо через saveMessage напряму
+        // Зберігаємо фінальну відповідь AI в історію
         saveMessage(generatedText, finalSenderClass);
         
     } catch (error) {
         // Виведення помилки як системного повідомлення
-        loadingMessage.classList.remove(...finalSenderClass.split(' ')); // Видаляємо всі AI/Mode класи
+        loadingMessage.classList.remove(...finalSenderClass.split(' ')); 
         loadingMessage.innerHTML = `<p>❌ Error: ${error.message}. Please check API key and try again.</p>`;
         loadingMessage.classList.add('system-message', 'error');
         
