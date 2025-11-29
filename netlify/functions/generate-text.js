@@ -1,7 +1,7 @@
 // netlify/functions/generate-text.js
 
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'; // ЧАТ-АПІ
-const MODEL = "openai/gpt-3.5-turbo"; // СУЧАСНА ЧАТ-МОДЕЛЬ
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'; 
+const MODEL = "openai/gpt-3.5-turbo"; // Надійна Chat-модель
 
 // Карта режимів для генерації системного prompt
 const MODE_PROMPTS = {
@@ -18,13 +18,16 @@ exports.handler = async (event) => {
 
     try {
         const { prompt, mode } = JSON.parse(event.body); 
-        // ТУТ ВАШ КЛЮЧ ПОВИНЕН БУТИ OPENROUTER_API_KEY
-        const apiKey = process.env.OPENROUTER_API_KEY; 
+        
+        // Використовуємо OPENROUTER_API_KEY як стандартну назву. 
+        // Якщо ви використовуєте іншу назву (наприклад, AI_GENERATOR), 
+        // вам потрібно змінити рядок нижче на process.env.ВАША_НАЗВА_КЛЮЧА
+        const apiKey = process.env.OPENROUTER_API_KEY || process.env.AI_GENERATOR;
 
         if (!apiKey) {
             return {
                 statusCode: 500,
-                body: JSON.stringify({ error: 'OpenRouter API Key is missing in Netlify settings (expected OPENROUTER_API_KEY).' }),
+                body: JSON.stringify({ error: 'Server Error: API Key (OPENROUTER_API_KEY or AI_GENERATOR) is missing or undefined in Netlify settings.' }),
             };
         }
 
@@ -32,6 +35,7 @@ exports.handler = async (event) => {
 
         const system_instruction = `${base_prompt} **CRITICAL: Respond only with the generated text in the same language as the user's request. Do not include any introductory or concluding phrases.**`;
         
+        // ВИКОРИСТАННЯ CHAT API
         const messages = [
             { role: "system", content: system_instruction },
             { role: "user", content: prompt }
@@ -41,11 +45,12 @@ exports.handler = async (event) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                // OpenRouter вимагає Authorization: Bearer <Key>
                 'Authorization': `Bearer ${apiKey}`, 
             },
             body: JSON.stringify({
                 model: MODEL,
-                messages: messages,
+                messages: messages, // Ключовий момент
                 max_tokens: 500,
                 temperature: 0.7,
             }),
@@ -55,7 +60,8 @@ exports.handler = async (event) => {
 
         if (!openaiResponse.ok) {
             console.error("OpenRouter Error:", openaiData);
-            throw new Error(openaiData.error?.message || `OpenRouter API returned an error (Status: ${openaiResponse.status}).`);
+            // Повертаємо деталі помилки з OpenRouter на фронтенд для діагностики
+            throw new Error(openaiData.error?.message || `OpenRouter API returned an error (Status: ${openaiResponse.status}). Check API Key validity/credit.`);
         }
         
         const generatedText = openaiData.choices[0].message.content.trim();
