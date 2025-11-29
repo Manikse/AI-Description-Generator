@@ -1,7 +1,8 @@
 // netlify/functions/generate-text.js
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'; 
-const MODEL = "openai/gpt-4o"; // Підвищуємо модель для кращої генерації коду (або gpt-3.5-turbo, якщо gpt-4o надто дорога)
+// Модель підвищена для кращої генерації коду
+const MODEL = "openai/gpt-4o"; 
 
 const KAIROS_SYSTEM_INSTRUCTION = `You are Kairos AI, an advanced, intelligent, and helpful AI assistant designed to perform tasks better than ChatGPT. You are highly versatile and can understand and generate content on a wide range of topics, formats, and styles.
 Your core capabilities include:
@@ -15,6 +16,7 @@ Your responses must be:
 
 
 exports.handler = async (event) => {
+    // Перевірка методу запиту
     if (event.httpMethod !== 'POST' || !event.body) {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
@@ -22,12 +24,14 @@ exports.handler = async (event) => {
     try {
         const { prompt } = JSON.parse(event.body); 
         
+        // Перевірка змінних оточення (використовує AI_GENERATOR або OPENROUTER_API_KEY)
         const apiKey = process.env.AI_GENERATOR || process.env.OPENROUTER_API_KEY; 
 
         if (!apiKey) {
+            // Повертаємо валідний JSON, навіть при помилці ключа
             return {
                 statusCode: 500,
-                body: JSON.stringify({ error: 'Server Error: API Key is missing.' }),
+                body: JSON.stringify({ error: 'Server Error: API Key (AI_GENERATOR or OPENROUTER_API_KEY) is missing in Netlify settings.' }),
             };
         }
 
@@ -36,6 +40,7 @@ exports.handler = async (event) => {
             { role: "user", content: prompt }
         ];
 
+        // Запит до OpenRouter API
         const openaiResponse = await fetch(OPENROUTER_API_URL, {
             method: 'POST',
             headers: {
@@ -45,16 +50,21 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 model: MODEL,
                 messages: messages, 
-                max_tokens: 1500, // Збільшуємо токени для коду
-                temperature: 0.7, // Знижуємо температуру для більшої точності коду
+                max_tokens: 1500, 
+                temperature: 0.7, 
             }),
         });
 
         const openaiData = await openaiResponse.json();
 
+        // Обробка помилок API
         if (!openaiResponse.ok) {
             console.error("OpenRouter Error:", openaiData);
-            throw new Error(openaiData.error?.message || `OpenRouter API returned an error (Status: ${openaiResponse.status}). Check API Key validity/credit.`);
+            // Це захищає від JSON-помилки на фронтенді, завжди повертаємо JSON
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: openaiData.error?.message || `OpenRouter API returned an error (Status: ${openaiResponse.status}). Check API Key validity/credit.` }),
+            };
         }
         
         const generatedText = openaiData.choices[0].message.content.trim();
