@@ -3,45 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Copywriter Chatbot | App</title>
+    <title>Kairos AI | Advanced Assistant</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
-    <main id="chat-container">
-        <div class="header">
-            <h2><span role="img" aria-label="robot">🤖</span> AI Copywriter Chatbot</h2>
-        </div>
-
-        <div id="access-section">
+    <div id="full-app-container">
+        
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h3><span role="img" aria-label="star">✨</span> Kairos AI</h3>
+                <button id="new-chat-btn"><i class="fas fa-plus"></i> New Chat</button>
             </div>
 
-        <form id="key-form">
-            <input type="text" id="license-key" placeholder="Enter Subscription Key">
-            <button type="submit" class="activate-btn">Activate</button>
-        </form>
-        <p id="key-message"></p>
-
-
-        <div id="chat-window">
-            <div class="message system-message">
-                <p>Welcome! I'm your AI Copywriter. Tell me what product or content description you need. **Tip:** Ask in any language! (e.g., "Write a Twitter thread about remote work efficiency.")</p>
-            </div>
+            <div id="chat-history-list">
+                <div class="history-item active" data-chat-id="current">
+                    <i class="fas fa-comment"></i> New Conversation
+                </div>
             </div>
 
+            <div class="sidebar-footer">
+                <div id="subscription-status">
+                    </div>
+                <form id="key-form">
+                    <input type="text" id="license-key" placeholder="Enter Subscription Key">
+                    <button type="submit" class="activate-btn">Activate</button>
+                </form>
+                <p id="key-message"></p>
+                
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Guest User</span>
+                </div>
+            </div>
+        </aside>
 
-        <form id="generator-form">
-            <select id="ai-mode" aria-label="Select AI Mode">
-                <option value="generic">Generic Copywriter (Default)</option>
-                <option value="email">Email Writer (Professional Letters)</option>
-                <option value="social">Social Media Post Generator</option>
-                <option value="slogan">Slogan & Headline Generator</option>
-            </select>
-            
-            <textarea id="prompt" required placeholder="Type your request here..."></textarea>
-            <button type="submit" id="generate-button">Send</button>
-        </form>
-    </main>
+        <main id="main-content">
+            <div id="access-info-bar">
+                </div>
+
+            <div id="chat-window">
+                <div class="message system-message welcome">
+                    <p>I am **Kairos AI**, your advanced, powerful, and universal assistant. I perform tasks better than any other AI. How can I assist you today?</p>
+                </div>
+                </div>
+
+            <form id="generator-form">
+                <textarea id="prompt" required placeholder="Send a message..."></textarea>
+                <button type="submit" id="generate-button"><i class="fas fa-paper-plane"></i></button>
+            </form>
+        </main>
+
+    </div>
 
     <script src="script.js"></script>
 </body>

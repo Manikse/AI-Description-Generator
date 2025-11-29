@@ -1,15 +1,25 @@
-// netlify/functions/generate-text.js
+// netlify/functions/generate-text.js (ЗАЛИШАЄТЬСЯ ЯК У ПОПЕРЕДНЬОМУ ПОВІДОМЛЕННІ)
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'; 
-const MODEL = "openai/gpt-3.5-turbo";
+const MODEL = "openai/gpt-3.5-turbo"; // Або будь-яка інша потужна модель на OpenRouter
 
-// ОНОВЛЕНА КАРТА РЕЖИМІВ: Generic тепер може відповідати на привітання.
-const MODE_PROMPTS = {
-    generic: "You are a professional marketing copywriter, but you can also answer general questions or greetings. If the user asks for a product description, write a compelling and short one. If the user sends a greeting, politely reply. **CRITICAL:** Respond only with the generated text in the same language as the user's request, and do not include any introductory or concluding phrases.",
-    email: "You are a professional email marketing specialist. Write a clear, concise, and persuasive email based on the user's request.",
-    social: "You are a social media manager. Write an engaging and viral post (max 280 characters if for Twitter) with relevant emojis and hashtags.",
-    slogan: "You are a creative advertising expert. Generate 3-5 short, catchy, and memorable slogans or headlines.",
-};
+const KAIROS_SYSTEM_INSTRUCTION = `You are Kairos AI, an advanced, intelligent, and helpful AI assistant designed to perform tasks better than ChatGPT. You are highly versatile and can understand and generate content on a wide range of topics, formats, and styles.
+Your capabilities include, but are not limited to:
+- Writing creative content (stories, poems, scripts, code)
+- Summarizing complex information
+- Answering questions across various domains
+- Generating different types of text formats (emails, social media posts, slogans, articles)
+- Providing explanations and tutorials
+- Engaging in natural, coherent conversations.
+
+Your responses should be:
+- **Comprehensive:** Provide thorough and complete answers.
+- **Accurate:** Ensure factual correctness.
+- **Creative:** Offer innovative and engaging content when appropriate.
+- **User-friendly:** Be clear, concise, and easy to understand.
+- **Adaptable:** Adjust your style and tone to the user's request.
+- **CRITICAL:** Respond ONLY with the generated text in the same language as the user's request. Do NOT include any introductory or concluding phrases like "Here is...", "I can help with...", "Hope this helps!", or conversational filler that is not part of the direct answer. Focus on delivering the requested content directly.`;
+
 
 exports.handler = async (event) => {
     if (event.httpMethod !== 'POST' || !event.body) {
@@ -17,10 +27,9 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { prompt, mode } = JSON.parse(event.body); 
+        const { prompt } = JSON.parse(event.body); 
         
-        // Використовуємо AI_GENERATOR або OPENROUTER_API_KEY
-        const apiKey = process.env.AI_GENERATOR || process.env.OPENROUTER_API_KEY;
+        const apiKey = process.env.AI_GENERATOR || process.env.OPENROUTER_API_KEY; 
 
         if (!apiKey) {
             return {
@@ -29,13 +38,8 @@ exports.handler = async (event) => {
             };
         }
 
-        const base_prompt = MODE_PROMPTS[mode] || MODE_PROMPTS.generic;
-
-        const system_instruction = `${base_prompt}`;
-        
-        // ВИКОРИСТАННЯ CHAT API
         const messages = [
-            { role: "system", content: system_instruction },
+            { role: "system", content: KAIROS_SYSTEM_INSTRUCTION },
             { role: "user", content: prompt }
         ];
 
@@ -48,8 +52,8 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 model: MODEL,
                 messages: messages, 
-                max_tokens: 500,
-                temperature: 0.7,
+                max_tokens: 1000, 
+                temperature: 0.8,
             }),
         });
 

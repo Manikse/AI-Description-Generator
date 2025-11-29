@@ -1,76 +1,129 @@
-// --- Налаштування Лічильника та Ключа ---
-const MAX_FREE_ATTEMPTS = 2;
-const MASTER_LICENSE_KEY = "AI-DESC-GEN-GMRD-B19C77-2025NOV-74A82F";
-const CHAT_HISTORY_KEY = 'ai_copuwriter_chat_history'; 
+// --- Налаштування Констант ---
+const MAX_FREE_ATTEMPTS = 5; // Збільшено для кращого досвіду
+const MASTER_LICENSE_KEY = "KAIROS-ADVANCED-2025-DEV-KEY"; 
+const CHAT_HISTORY_KEY = 'kairos_ai_chat_history'; 
+const CURRENT_CHAT_ID_KEY = 'kairos_ai_current_chat_id';
 
 // Отримання елементів DOM
 const chatWindow = document.getElementById('chat-window');
+const chatHistoryList = document.getElementById('chat-history-list');
 const keyForm = document.getElementById('key-form');
 const keyInput = document.getElementById('license-key');
 const keyMessage = document.getElementById('key-message');
 const promptInput = document.getElementById('prompt');
 const generatorForm = document.getElementById('generator-form');
 const generateButton = document.getElementById('generate-button');
-const accessSection = document.getElementById('access-section');
-const aiModeSelect = document.getElementById('ai-mode');
+const accessInfoBar = document.getElementById('access-info-bar');
+const subscriptionStatus = document.getElementById('subscription-status');
+const newChatBtn = document.getElementById('new-chat-btn');
 
+let allChats = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '{}');
+let currentChatId = localStorage.getItem(CURRENT_CHAT_ID_KEY) || null;
 
 // -------------------------------------------------------------------
-// 💾 ФУНКЦІЇ ЗБЕРЕЖЕННЯ ІСТОРІЇ
+// 💾 ФУНКЦІЇ ІСТОРІЇ ЧАТІВ
 // -------------------------------------------------------------------
 
-/**
- * Створює елемент повідомлення та додає його у DOM.
- */
-function createMessageElement(content, senderClass, isInitialLoad = false) {
-    const messageContainer = document.createElement('div');
-    
-    // Додаємо клас 'message' та всі класи з senderClass
-    messageContainer.classList.add('message', ...senderClass.split(' ')); 
-    
-    // Якщо це AI-відповідь, додаємо кнопку "Copy"
-    if (senderClass.includes('ai-message') && !senderClass.includes('error')) {
-        messageContainer.innerHTML = `<p>${content}</p><button class="copy-btn">Copy</button>`;
+/** Ініціалізація або завантаження поточного чату */
+function initChatSystem() {
+    if (!currentChatId || !allChats[currentChatId]) {
+        startNewChat(false);
     } else {
-        messageContainer.innerHTML = `<p>${content}</p>`;
+        loadChat(currentChatId);
     }
+    renderHistorySidebar();
+    updateCounter();
+}
+
+/** Створення нового чату */
+function startNewChat(savePrevious = true) {
+    const newId = Date.now().toString();
     
-    chatWindow.appendChild(messageContainer);
-    
-    // Зберігаємо лише повідомлення користувача та успішні відповіді AI
-    if (!isInitialLoad && senderClass.includes('user-message') || (senderClass.includes('ai-message') && !senderClass.includes('error'))) {
-        saveMessage(content, senderClass);
+    if (savePrevious && currentChatId && allChats[currentChatId] && allChats[currentChatId].messages.length > 1) {
+        // Зберігаємо існуючий чат, якщо в ньому є повідомлення
+        // Назва чату = перше повідомлення користувача
+        // Зберігатиметься при генерації першої відповіді
     }
 
+    currentChatId = newId;
+    allChats[newId] = {
+        id: newId,
+        title: 'New Conversation',
+        messages: [{
+            content: "I am **Kairos AI**, your advanced, powerful, and universal assistant. I perform tasks better than any other AI. How can I assist you today?",
+            senderClass: 'system-message welcome'
+        }],
+        timestamp: Date.now()
+    };
+    
+    localStorage.setItem(CURRENT_CHAT_ID_KEY, newId);
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(allChats));
+    loadChat(newId);
+    renderHistorySidebar();
+}
+
+/** Завантаження чату за ID */
+function loadChat(chatId) {
+    currentChatId = chatId;
+    localStorage.setItem(CURRENT_CHAT_ID_KEY, chatId);
+    chatWindow.innerHTML = '';
+    
+    const chat = allChats[chatId];
+    if (chat) {
+        chat.messages.forEach(msg => {
+            createMessageElement(msg.content, msg.senderClass, true);
+        });
+    }
+    renderHistorySidebar();
     chatWindow.scrollTop = chatWindow.scrollHeight;
-    return messageContainer;
 }
 
-/** Зберігає повідомлення в localStorage. */
-function saveMessage(content, senderClass) {
-    const history = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '[]');
-    history.push({ content: content, senderClass: senderClass, timestamp: Date.now() });
-    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(history));
-}
+/** Зберігає повідомлення в поточний активний чат */
+function saveMessageToChat(content, senderClass) {
+    if (!allChats[currentChatId]) return;
 
-/** Завантажує повідомлення з localStorage і відображає їх. */
-function loadHistory() {
-    const history = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '[]');
+    allChats[currentChatId].messages.push({
+        content: content,
+        senderClass: senderClass
+    });
     
-    if (history.length > 0) {
-        const welcomeMessage = chatWindow.querySelector('.system-message');
-        if (welcomeMessage) {
-            welcomeMessage.style.display = 'none';
-        }
+    // Оновлення назви чату (якщо це перша пара запит-відповідь)
+    if (allChats[currentChatId].messages.length === 3 && senderClass.includes('ai-message')) {
+        const userPrompt = allChats[currentChatId].messages[1].content;
+        const newTitle = userPrompt.substring(0, 30) + (userPrompt.length > 30 ? '...' : '');
+        allChats[currentChatId].title = newTitle;
+        renderHistorySidebar(); // Перемальовуємо сайдбар, щоб оновити назву
     }
+
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(allChats));
+}
+
+/** Малює елементи історії в бічній панелі */
+function renderHistorySidebar() {
+    chatHistoryList.innerHTML = '';
     
-    history.forEach(msg => {
-        createMessageElement(msg.content, msg.senderClass, true); 
+    const sortedChats = Object.values(allChats)
+        .sort((a, b) => b.timestamp - a.timestamp); // Сортування за часом
+        
+    sortedChats.forEach(chat => {
+        const item = document.createElement('div');
+        item.classList.add('history-item');
+        if (chat.id === currentChatId) {
+            item.classList.add('active');
+        }
+        item.setAttribute('data-chat-id', chat.id);
+        item.innerHTML = `<i class="fas fa-comment"></i> <span>${chat.title}</span>`;
+        
+        item.addEventListener('click', () => {
+            loadChat(chat.id);
+        });
+        
+        chatHistoryList.appendChild(item);
     });
 }
 
 // -------------------------------------------------------------------
-// ⚙️ ЛІЧИЛЬНИК ТА АКТИВАЦІЯ
+// ⚙️ UI та АКТИВАЦІЯ
 // -------------------------------------------------------------------
 
 function updateCounter() {
@@ -78,67 +131,75 @@ function updateCounter() {
     let remaining = MAX_FREE_ATTEMPTS - attempts;
     
     if (localStorage.getItem('license_activated') === 'true') {
-        accessSection.innerHTML = '<p style="color: green; font-weight: bold;">✅ Full Access Activated (Subscription Key).</p>';
-        generatorForm.style.pointerEvents = 'auto'; 
+        const today = new Date().toLocaleDateString();
+        accessInfoBar.innerHTML = `<p style="color: #4CAF50;">✅ **Premium Active** (Full Access). Usage: Unlimited.</p>`;
+        subscriptionStatus.innerHTML = `<p style="color: #4CAF50;">Active Premium Subscription.</p>`;
+        keyForm.style.display = 'none';
         generateButton.disabled = false;
     } else if (remaining > 0) {
-        accessSection.innerHTML = `<p>👉 **Free Trial:** ${remaining} generation(s) remaining. Get full access below.</p>`;
-        generatorForm.style.pointerEvents = 'auto'; 
+        accessInfoBar.innerHTML = `<p>👉 **Free Trial:** ${remaining} generation(s) remaining. Purchase a subscription key below.</p>`;
+        subscriptionStatus.innerHTML = `<p>Free Trial: ${remaining} uses left.</p>`;
+        keyForm.style.display = 'flex';
         generateButton.disabled = false;
     } else {
-        accessSection.innerHTML = `<p style="color: red; font-weight: bold;">❌ Free trials used up. Activate your subscription key below!</p>`;
-        generatorForm.style.pointerEvents = 'none';
+        accessInfoBar.innerHTML = `<p style="color: red; font-weight: bold;">❌ Free trials used up. Please activate your subscription key below!</p>`;
+        subscriptionStatus.innerHTML = `<p style="color: red;">Trial Expired.</p>`;
+        keyForm.style.display = 'flex';
         generateButton.disabled = true;
     }
 }
 
-updateCounter();
-loadHistory(); 
+// -------------------------------------------------------------------
+// 🤖 ЛОГІКА ГЕНЕРАЦІЇ
+// -------------------------------------------------------------------
 
-keyForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const inputKey = keyInput.value.trim();
-
-    if (inputKey === MASTER_LICENSE_KEY) {
-        localStorage.setItem('license_activated', 'true');
-        keyMessage.textContent = '✅ Activated! You have full access.';
-        keyMessage.style.color = 'green';
-        keyForm.style.display = 'none';
-        updateCounter();
+/** Створює елемент повідомлення та додає його у DOM. (Фронтенд-відображення) */
+function createMessageElement(content, senderClass, isInitialLoad = false) {
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('message', ...senderClass.split(' ')); 
+    
+    // Для відображення Markdown (якщо потрібно)
+    const formattedContent = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    if (senderClass.includes('ai-message') && !senderClass.includes('error')) {
+        messageContainer.innerHTML = `<p>${formattedContent}</p><button class="copy-btn"><i class="fas fa-copy"></i></button>`;
     } else {
-        keyMessage.textContent = '❌ Invalid subscription key. Please check and try again.';
-        keyMessage.style.color = 'red';
+        messageContainer.innerHTML = `<p>${formattedContent}</p>`;
     }
-});
+    
+    chatWindow.appendChild(messageContainer);
+    
+    // Якщо це не початкове завантаження, зберігаємо повідомлення
+    if (!isInitialLoad) {
+        saveMessageToChat(content, senderClass);
+    }
 
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return messageContainer;
+}
 
-// -------------------------------------------------------------------
-// 🤖 ЛОГІКА ГЕНЕРАЦІЇ ЧАТ-ПОВІДОМЛЕННЯ
-// -------------------------------------------------------------------
 
 generatorForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const prompt = promptInput.value.trim();
     if (!prompt) return;
 
-    const mode = aiModeSelect.value; 
-    const modeClass = mode !== 'generic' ? `mode-${mode}` : ''; 
-    const finalSenderClass = `ai-message ${modeClass}`; 
+    const finalSenderClass = `ai-message`; 
 
     const isActivated = localStorage.getItem('license_activated') === 'true';
     let attempts = parseInt(localStorage.getItem('free_attempts') || '0');
 
     if (!isActivated && attempts >= MAX_FREE_ATTEMPTS) {
-        createMessageElement(`Subscription required. You have used ${MAX_FREE_ATTEMPTS} free generations.`, 'system-message error');
+        createMessageElement(`Subscription required. You have used ${MAX_FREE_ATTEMPTS} free generations.`, 'system-message error', false);
         updateCounter();
         return;
     }
     
-    // 2. Відображення запиту користувача
-    createMessageElement(prompt, 'user-message'); 
+    // 1. Створюємо повідомлення користувача і зберігаємо його
+    createMessageElement(prompt, 'user-message', false); 
     promptInput.value = '';
 
-    // 3. Індикатор завантаження
+    // 2. Індикатор завантаження
     const loadingMessage = createMessageElement(`<span class="loading-dots">Generating...</span>`, finalSenderClass, true); 
     
     generateButton.disabled = true;
@@ -147,7 +208,7 @@ generatorForm.addEventListener('submit', async (e) => {
         const response = await fetch('/.netlify/functions/generate-text', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt, mode }), 
+            body: JSON.stringify({ prompt }), 
         });
 
         const data = await response.json();
@@ -156,24 +217,22 @@ generatorForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Server generation error.');
         }
 
-        const generatedText = data.text || "Sorry, the AI did not return any text. Please try a different prompt.";
+        const generatedText = data.text || "Sorry, Kairos AI did not return any text. Please try a different prompt.";
         
-        // 4. Оновлення лічильника (ТІЛЬКИ при успіху)
+        // 3. Оновлення лічильника (ТІЛЬКИ при успіху)
         if (!isActivated) {
             attempts++;
             localStorage.setItem('free_attempts', attempts.toString());
         }
 
-        // 5. Заміна індикатора на результат
-        loadingMessage.innerHTML = `<p>${generatedText}</p><button class="copy-btn">Copy</button>`;
-
-        // Зберігаємо фінальну відповідь AI в історію
-        saveMessage(generatedText, finalSenderClass);
+        // 4. Заміна індикатора на результат та збереження
+        loadingMessage.innerHTML = `<p>${generatedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p><button class="copy-btn"><i class="fas fa-copy"></i></button>`;
+        saveMessageToChat(generatedText, finalSenderClass); // Зберігаємо фінальну відповідь AI
         
     } catch (error) {
         // Виведення помилки як системного повідомлення
         loadingMessage.classList.remove(...finalSenderClass.split(' ')); 
-        loadingMessage.innerHTML = `<p>❌ Error: ${error.message}. Please check API key and try again.</p>`;
+        loadingMessage.innerHTML = `<p>❌ Error: ${error.message}. Please check API key/credit.</p>`;
         loadingMessage.classList.add('system-message', 'error');
         
         console.error('Fetch error:', error);
@@ -183,17 +242,47 @@ generatorForm.addEventListener('submit', async (e) => {
     }
 });
 
-// --- Логіка Копіювання (Делегування) ---
+
+// --- Інша Логіка ---
+
+keyForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const inputKey = keyInput.value.trim();
+
+    if (inputKey === MASTER_LICENSE_KEY) {
+        localStorage.setItem('license_activated', 'true');
+        keyMessage.textContent = '✅ Subscription Active! Full access granted.';
+        keyMessage.style.color = '#4CAF50';
+        updateCounter();
+    } else {
+        keyMessage.textContent = '❌ Invalid subscription key. Try KAIROS-ADVANCED-2025-DEV-KEY';
+        keyMessage.style.color = 'red';
+    }
+});
+
+newChatBtn.addEventListener('click', () => {
+    startNewChat(true);
+});
+
+
+// Логіка Копіювання (Делегування)
 chatWindow.addEventListener('click', (e) => {
-    if (e.target.classList.contains('copy-btn')) {
-        const textToCopy = e.target.parentElement.querySelector('p').textContent;
+    if (e.target.closest('.copy-btn')) {
+        const button = e.target.closest('.copy-btn');
+        const textToCopy = button.parentElement.querySelector('p').textContent;
         
         if (textToCopy.trim().length > 0) {
             navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('Text copied successfully!');
+                const icon = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    button.innerHTML = icon;
+                }, 1000);
             }).catch(err => {
                 console.error('Could not copy text: ', err);
             });
         }
     }
 });
+
+initChatSystem();
