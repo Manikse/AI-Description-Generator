@@ -296,24 +296,91 @@ button:disabled {
     float: right; /* Позиціонуємо праворуч */
     transition: background-color 0.2s;
 }
+/* ... (Існуючі стилі) ... */
+
+/* --- Стилі Повідомлень (Чат-бульбашки) --- */
+
+.message {
+    display: flex;
+    margin-bottom: 15px;
+    max-width: 85%;
+    animation: fadeIn 0.5s ease-out;
+}
+/* ... */
+/* Повідомлення AI (Ліворуч) */
+.ai-message {
+    margin-right: auto;
+    justify-content: flex-start;
+    display: flex; /* НОВИНКА: Додаємо flex для розміщення кнопки поруч */
+    align-items: flex-end; /* Вирівнюємо елементи по нижньому краю */
+}
+.ai-message p {
+    background-color: var(--ai-bubble);
+    color: var(--text-light);
+    border-bottom-left-radius: 6px; 
+    /* НОВИНКА: Не дозволяємо p займати 100% ширини message, щоб звільнити місце для кнопки */
+    max-width: 100%; 
+    margin-right: 10px; /* Відступ між текстом та кнопкою */
+}
+
+/* Кнопка Копіювання всередині AI-повідомлення - ОНОВЛЕНО */
+.copy-btn {
+    background-color: #555;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.8em; /* Зменшуємо розмір, щоб вона була компактною */
+    margin: 0; /* Прибираємо всі зовнішні відступи */
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: block;
+    height: fit-content; /* Фіксуємо висоту по контенту */
+    align-self: flex-end; /* Позиціонуємо кнопку внизу контейнера */
+}
 .copy-btn:hover {
-    background-color: #777;
+    background-color: var(--primary-color); /* Використовуємо акцентний колір */
 }
 
-/* Індикатор Завантаження */
-.loading-dots {
-    display: inline-block; /* Щоб анімація працювала добре */
+/* ------------------------------------- */
+/* --- ДИНАМІЧНІ СТИЛІ РЕЖИМІВ (MODE CLASSES) --- */
+/* ------------------------------------- */
+/* Ці класи додаватимуться до .ai-message через JS */
+
+/* Режим Email (Професійний - зелений/блакитний) */
+.mode-email p {
+    background-color: #008080; /* Teal/Бірюзовий */
+    color: white;
 }
-.loading-dots:after {
-    content: ' .';
-    animation: dots 1s steps(5, end) infinite;
+.mode-email .copy-btn {
+    background-color: #008080;
 }
-@keyframes dots {
-    to { content: ' ...'; }
+.mode-email .copy-btn:hover {
+    background-color: #00a0a0;
 }
 
-/* Анімація появи повідомлення */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Режим Social Media (Вірусний - помаранчевий/рожевий) */
+.mode-social p {
+    background-color: #FF5733; /* Яскраво-помаранчевий */
+    color: white;
 }
+.mode-social .copy-btn {
+    background-color: #FF5733;
+}
+.mode-social .copy-btn:hover {
+    background-color: #ff7f50;
+}
+
+/* Режим Slogan (Креативний - фіолетовий/мажента) */
+.mode-slogan p {
+    background-color: #8A2BE2; /* Синьо-фіолетовий */
+    color: white;
+}
+.mode-slogan .copy-btn {
+    background-color: #8A2BE2;
+}
+.mode-slogan .copy-btn:hover {
+    background-color: #9932CC;
+}
+
+/* Режим Generic (Базовий - використовує старий .ai-message) */
+/* ... не потребує додаткових правил ... */
