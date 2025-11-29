@@ -1,7 +1,7 @@
 // --- Налаштування Лічильника та Ключа ---
 const MAX_FREE_ATTEMPTS = 2;
 const MASTER_LICENSE_KEY = "AI-DESC-GEN-GMRD-B19C77-2025NOV-74A82F";
-const CHAT_HISTORY_KEY = 'ai_copuwriter_chat_history'; // Ключ для історії чату в localStorage
+const CHAT_HISTORY_KEY = 'ai_copuwriter_chat_history'; 
 
 // Отримання елементів DOM
 const chatWindow = document.getElementById('chat-window');
@@ -21,14 +21,11 @@ const aiModeSelect = document.getElementById('ai-mode');
 
 /**
  * Створює елемент повідомлення та додає його у DOM.
- * @param {string} content - HTML-вміст повідомлення.
- * @param {string} senderClass - Клас(и) відправника ('user-message', 'ai-message mode-email', 'system-message error').
- * @param {boolean} isInitialLoad - Прапорець, щоб не зберігати повідомлення при завантаженні.
  */
 function createMessageElement(content, senderClass, isInitialLoad = false) {
     const messageContainer = document.createElement('div');
     
-    // ВАЖЛИВА ЗМІНА: Додаємо всі класи, розділені пробілом
+    // Додаємо клас 'message' та всі класи з senderClass
     messageContainer.classList.add('message', ...senderClass.split(' ')); 
     
     // Якщо це AI-відповідь, додаємо кнопку "Copy"
@@ -41,11 +38,7 @@ function createMessageElement(content, senderClass, isInitialLoad = false) {
     chatWindow.appendChild(messageContainer);
     
     // Зберігаємо лише повідомлення користувача та успішні відповіді AI
-    if (!isInitialLoad && !senderClass.includes('system-message') && senderClass.includes('ai-message')) {
-        saveMessage(content, senderClass);
-    }
-    // Зберігаємо повідомлення користувача (вони завжди без класу 'system-message')
-    if (!isInitialLoad && senderClass.includes('user-message')) {
+    if (!isInitialLoad && senderClass.includes('user-message') || (senderClass.includes('ai-message') && !senderClass.includes('error'))) {
         saveMessage(content, senderClass);
     }
 
@@ -77,7 +70,7 @@ function loadHistory() {
 }
 
 // -------------------------------------------------------------------
-// ⚙️ ІНШІ ФУНКЦІЇ (Лічильник та Активація)
+// ⚙️ ЛІЧИЛЬНИК ТА АКТИВАЦІЯ
 // -------------------------------------------------------------------
 
 function updateCounter() {
@@ -98,8 +91,6 @@ function updateCounter() {
         generateButton.disabled = true;
     }
 }
-
-// --- Ініціалізація та Логіка Активації ---
 
 updateCounter();
 loadHistory(); 
