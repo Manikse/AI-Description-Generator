@@ -3,48 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Description Chatbot</title>
-    
+    <title>AI Copywriter Chatbot | Home</title>
     <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* Стилі лише для головної сторінки */
+        .landing-container {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .landing-container h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+        }
+        .landing-container p {
+            font-size: 1.3em;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: #ccc;
+        }
+        .landing-features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .feature-card {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 10px;
+            width: 30%;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+    </style>
 </head>
 <body>
 
-    <header>
-        <h1>💬 AI Copywriter Chatbot</h1>
-    </header>
-    
-    <section class="access-area">
-        <div id="access-section">
-            <p>Try 2 generations for free. Unlock unlimited use with a monthly subscription.</p> 
-            <a href="https://manikse.gumroad.com/l/dvkny" target="_blank" class="gumroad-button">
-                Subscribe Now (€9/Month)
-            </a>
-        </div>
+    <main class="landing-container">
+        <h1>✨ The AI Copywriter Chatbot</h1>
+        <p>Your ultimate writing assistant. Generate compelling, tailored, and multilingual content for any marketing need in seconds. From tweets to professional emails, we've got you covered.</p>
+        
+        <a href="app.html" class="gumroad-button" style="padding: 15px 40px; font-size: 1.2em;">
+            Start Generating Now 🚀
+        </a>
 
-        <div id="generator-access">
-            <form id="key-form">
-                <input type="text" id="license-key" required placeholder="Enter Subscription Key">
-                <button type="submit">Activate</button>
-            </form>
-            <p id="key-message" style="margin-top: 5px;"></p>
-        </div>
-        <hr>
-    </section>
-
-    <main id="chat-container">
-        <div id="chat-window">
-            <div class="message system-message">
-                <p>Welcome! I'm your AI Copywriter. Tell me what product or content description you need.</p>
-                <p>💡 **Tip:** Ask in any language! (e.g., "Write a Twitter thread about remote work efficiency.")</p>
+        <div class="landing-features">
+            <div class="feature-card">
+                <h3>Multi-Lingual</h3>
+                <p>Generate content in any language based on your prompt.</p>
             </div>
+            <div class="feature-card">
+                <h3>Tailored Modes</h3>
+                <p>Switch between Email Writer, Social Media Pro, and Product Description modes.</p>
             </div>
-
-        <form id="generator-form">
-            <textarea id="prompt" required placeholder="Type your request here..."></textarea>
-            <button type="submit" id="generate-button">Send</button>
-        </form>
+            <div class="feature-card">
+                <h3>Persistent History</h3>
+                <p>Never lose your past generations with local chat history saving.</p>
+            </div>
+        </div>
     </main>
-
-    <script src="script.js"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 // --- Налаштування Лічильника та Ключа ---
 const MAX_FREE_ATTEMPTS = 2;
 const MASTER_LICENSE_KEY = "AI-DESC-GEN-GMRD-B19C77-2025NOV-74A82F";
+const CHAT_HISTORY_KEY = 'ai_copuwriter_chat_history'; // Ключ для історії чату в localStorage
 
 const chatWindow = document.getElementById('chat-window');
 const keyForm = document.getElementById('key-form');
@@ -10,20 +11,69 @@ const promptInput = document.getElementById('prompt');
 const generatorForm = document.getElementById('generator-form');
 const generateButton = document.getElementById('generate-button');
 const accessSection = document.getElementById('access-section');
+const aiModeSelect = document.getElementById('ai-mode'); // НОВИЙ ЕЛЕМЕНТ: Селектор режиму
 
 
-// Функція створення елемента повідомлення
-function createMessageElement(content, senderClass) {
+// -------------------------------------------------------------------
+// 💾 ФУНКЦІЇ ЗБЕРЕЖЕННЯ ІСТОРІЇ
+// -------------------------------------------------------------------
+
+/**
+ * Створює елемент повідомлення та додає його у DOM.
+ * @param {string} content - HTML-вміст повідомлення.
+ * @param {string} senderClass - Клас відправника ('user-message', 'ai-message', 'system-message').
+ * @param {boolean} isInitialLoad - Прапорець, щоб не зберігати повідомлення при завантаженні.
+ */
+function createMessageElement(content, senderClass, isInitialLoad = false) {
     const messageContainer = document.createElement('div');
     messageContainer.classList.add('message', senderClass);
-    messageContainer.innerHTML = `<p>${content}</p>`;
+    
+    // Якщо це AI-відповідь, додаємо кнопку "Copy"
+    if (senderClass === 'ai-message') {
+        messageContainer.innerHTML = `<p>${content}</p><button class="copy-btn">Copy</button>`;
+    } else {
+        messageContainer.innerHTML = `<p>${content}</p>`;
+    }
+    
     chatWindow.appendChild(messageContainer);
     
-    // Скрол вниз до останнього повідомлення
+    // Якщо це не завантаження історії, зберігаємо повідомлення
+    if (!isInitialLoad && senderClass !== 'system-message') {
+        saveMessage(content, senderClass);
+    }
+
     chatWindow.scrollTop = chatWindow.scrollHeight;
-    
     return messageContainer;
 }
+
+/** Зберігає повідомлення в localStorage. */
+function saveMessage(content, senderClass) {
+    const history = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '[]');
+    history.push({ content: content, senderClass: senderClass, timestamp: Date.now() });
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(history));
+}
+
+/** Завантажує повідомлення з localStorage і відображає їх. */
+function loadHistory() {
+    const history = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '[]');
+    
+    // Якщо історія є, видаляємо вітальне повідомлення з DOM
+    if (history.length > 0) {
+        const welcomeMessage = chatWindow.querySelector('.system-message');
+        if (welcomeMessage) {
+            welcomeMessage.style.display = 'none';
+        }
+    }
+    
+    history.forEach(msg => {
+        // Відновлюємо повідомлення без повторного збереження
+        createMessageElement(msg.content, msg.senderClass, true); 
+    });
+}
+
+// -------------------------------------------------------------------
+// ⚙️ ІНШІ ФУНКЦІЇ
+// -------------------------------------------------------------------
 
 // Функція оновлення лічильника
 function updateCounter() {
@@ -31,12 +81,13 @@ function updateCounter() {
     let remaining = MAX_FREE_ATTEMPTS - attempts;
     
     if (localStorage.getItem('license_activated') === 'true') {
+        // Тут може бути майбутня логіка перевірки активної підписки на Gumroad/Stripe
         accessSection.innerHTML = '<p style="color: green; font-weight: bold;">✅ Full Access Activated (Subscription Key).</p>';
     } else if (remaining > 0) {
         accessSection.innerHTML = `<p>👉 **Free Trial:** ${remaining} generation(s) remaining. Get full access below.</p>`;
     } else {
         accessSection.innerHTML = `<p style="color: red; font-weight: bold;">❌ Free trials used up. Activate your subscription key below!</p>`;
-        generatorForm.style.pointerEvents = 'none'; // Блокуємо форму вводу
+        generatorForm.style.pointerEvents = 'none';
         generateButton.disabled = true;
     }
 }
@@ -44,6 +95,7 @@ function updateCounter() {
 // --- Ініціалізація та Логіка Активації ---
 
 updateCounter();
+loadHistory(); // <-- ЗАВАНТАЖЕННЯ ІСТОРІЇ ПРИ СТАРТІ
 
 keyForm.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -54,7 +106,7 @@ keyForm.addEventListener('submit', function(e) {
         keyMessage.textContent = '✅ Activated! You have full access.';
         keyMessage.style.color = 'green';
         keyForm.style.display = 'none';
-        generatorForm.style.pointerEvents = 'auto'; // Розблоковуємо
+        generatorForm.style.pointerEvents = 'auto'; 
         generateButton.disabled = false;
         updateCounter();
     } else {
@@ -71,7 +123,9 @@ generatorForm.addEventListener('submit', async (e) => {
     const prompt = promptInput.value.trim();
     if (!prompt) return;
 
-    // 1. Перевірка доступу
+    // НОВИЙ РЯДОК: Зчитуємо вибраний режим
+    const mode = aiModeSelect.value; 
+
     const isActivated = localStorage.getItem('license_activated') === 'true';
     let attempts = parseInt(localStorage.getItem('free_attempts') || '0');
 
@@ -82,11 +136,11 @@ generatorForm.addEventListener('submit', async (e) => {
     }
     
     // 2. Відображення запиту користувача
-    createMessageElement(prompt, 'user-message');
-    promptInput.value = ''; // Очищаємо інпут
+    createMessageElement(prompt, 'user-message'); 
+    promptInput.value = '';
 
     // 3. Індикатор завантаження
-    const loadingMessage = createMessageElement('<span class="loading-dots">Generating...</span>', 'ai-message');
+    const loadingMessage = createMessageElement('<span class="loading-dots">Generating...</span>', 'ai-message', true); 
     
     generateButton.disabled = true;
 
@@ -94,7 +148,8 @@ generatorForm.addEventListener('submit', async (e) => {
         const response = await fetch('/.netlify/functions/generate-text', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt }),
+            // ЗМІНА ТУТ: Надсилаємо і prompt, і mode
+            body: JSON.stringify({ prompt, mode }),
         });
 
         const data = await response.json();
@@ -103,9 +158,6 @@ generatorForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Server generation error.');
         }
 
-        // *****************************************************************
-        // ВИПРАВЛЕННЯ: Перевіряємо, чи повернувся текст
-        // *****************************************************************
         const generatedText = data.text || "Sorry, the AI did not return any text. Please try a different prompt.";
         
         // 4. Оновлення лічильника (ТІЛЬКИ при успіху)
@@ -117,15 +169,13 @@ generatorForm.addEventListener('submit', async (e) => {
         // 5. Заміна індикатора на результат
         loadingMessage.innerHTML = `<p>${generatedText}</p><button class="copy-btn">Copy</button>`;
         loadingMessage.classList.add('ai-message');
+
+        // Зберігаємо фінальну відповідь AI в історію
+        saveMessage(generatedText, 'ai-message'); 
         
     } catch (error) {
-        // *****************************************************************
-        // ВИПРАВЛЕННЯ: Виведення помилки як системного повідомлення
-        // *****************************************************************
-        // Спочатку видаляємо клас 'ai-message', щоб не виглядав як бульбашка
+        // Виведення помилки як системного повідомлення
         loadingMessage.classList.remove('ai-message'); 
-        
-        // Встановлюємо вміст і класи для системної помилки
         loadingMessage.innerHTML = `<p>❌ Error: ${error.message}. Please check API key and try again.</p>`;
         loadingMessage.classList.add('system-message', 'error');
         
@@ -139,10 +189,9 @@ generatorForm.addEventListener('submit', async (e) => {
 // --- Логіка Копіювання (Делегування) ---
 chatWindow.addEventListener('click', (e) => {
     if (e.target.classList.contains('copy-btn')) {
-        // ВИПРАВЛЕННЯ: Копіюємо текст лише з елемента <p>
         const textToCopy = e.target.parentElement.querySelector('p').textContent;
         
-        if (textToCopy.trim().length > 0) { // Перевірка на порожній текст
+        if (textToCopy.trim().length > 0) {
             navigator.clipboard.writeText(textToCopy).then(() => {
                 alert('Text copied successfully!');
             }).catch(err => {

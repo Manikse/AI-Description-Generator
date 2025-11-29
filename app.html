@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Description Chatbot</title>
+    
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <header>
+        <h1>💬 AI Copywriter Chatbot</h1>
+    </header>
+    ри
+    <section class="access-area">
+        <div id="access-section">
+            <p>Try 2 generations for free. Unlock unlimited use with a monthly subscription.</p> 
+            <a href="https://manikse.gumroad.com/l/dvkny" target="_blank" class="gumroad-button">
+                Subscribe Now (€9/Month)
+            </a>
+        </div>
+
+        <div id="generator-access">
+            <form id="key-form">
+                <input type="text" id="license-key" required placeholder="Enter Subscription Key">
+                <button type="submit">Activate</button>
+            </form>
+            <p id="key-message" style="margin-top: 5px;"></p>
+        </div>
+        <hr>
+    </section>
+
+    <main id="chat-container">
+        <div id="chat-window">
+            <div class="message system-message">
+                <p>Welcome! I'm your AI Copywriter. Tell me what product or content description you need.</p>
+                <p>💡 **Tip:** Ask in any language! (e.g., "Write a Twitter thread about remote work efficiency.")</p>
+            </div>
+            </div>
+
+        <form id="generator-form">
+            <select id="ai-mode" aria-label="Select AI Mode">
+                <option value="generic">Generic Copywriter (Default)</option>
+                <option value="email">Email Writer (Professional Letters)</option>
+                <option value="social">Social Media Post Generator</option>
+                <option value="slogan">Slogan & Headline Generator</option>
+            </select>
+            <textarea id="prompt" required placeholder="Type your request here..."></textarea>
+            <button type="submit" id="generate-button">Send</button>
+        </form>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
