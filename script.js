@@ -12,7 +12,7 @@ const promptInput = document.getElementById('prompt');
 const generatorForm = document.getElementById('generator-form');
 const generateButton = document.getElementById('generate-button');
 const accessSection = document.getElementById('access-section');
-const aiModeSelect = document.getElementById('ai-mode'); // НОВИЙ ЕЛЕМЕНТ: Селектор режиму
+const aiModeSelect = document.getElementById('ai-mode');
 
 
 // -------------------------------------------------------------------
@@ -22,17 +22,17 @@ const aiModeSelect = document.getElementById('ai-mode'); // НОВИЙ ЕЛЕМ�
 /**
  * Створює елемент повідомлення та додає його у DOM.
  * @param {string} content - HTML-вміст повідомлення.
- * @param {string} senderClass - Клас(и) відправника ('user-message', 'ai-message mode-email', 'system-message').
+ * @param {string} senderClass - Клас(и) відправника ('user-message', 'ai-message mode-email', 'system-message error').
  * @param {boolean} isInitialLoad - Прапорець, щоб не зберігати повідомлення при завантаженні.
  */
 function createMessageElement(content, senderClass, isInitialLoad = false) {
     const messageContainer = document.createElement('div');
     
     // ВАЖЛИВА ЗМІНА: Додаємо всі класи, розділені пробілом
-    messageContainer.classList.add(...senderClass.split(' ')); 
+    messageContainer.classList.add('message', ...senderClass.split(' ')); 
     
     // Якщо це AI-відповідь, додаємо кнопку "Copy"
-    if (senderClass.includes('ai-message')) {
+    if (senderClass.includes('ai-message') && !senderClass.includes('error')) {
         messageContainer.innerHTML = `<p>${content}</p><button class="copy-btn">Copy</button>`;
     } else {
         messageContainer.innerHTML = `<p>${content}</p>`;
@@ -40,8 +40,12 @@ function createMessageElement(content, senderClass, isInitialLoad = false) {
     
     chatWindow.appendChild(messageContainer);
     
-    // Якщо це не завантаження історії, зберігаємо повідомлення
-    if (!isInitialLoad && senderClass !== 'system-message' && !senderClass.includes('error')) {
+    // Зберігаємо лише повідомлення користувача та успішні відповіді AI
+    if (!isInitialLoad && !senderClass.includes('system-message') && senderClass.includes('ai-message')) {
+        saveMessage(content, senderClass);
+    }
+    // Зберігаємо повідомлення користувача (вони завжди без класу 'system-message')
+    if (!isInitialLoad && senderClass.includes('user-message')) {
         saveMessage(content, senderClass);
     }
 
@@ -60,7 +64,6 @@ function saveMessage(content, senderClass) {
 function loadHistory() {
     const history = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '[]');
     
-    // Якщо історія є, приховуємо вітальне системне повідомлення
     if (history.length > 0) {
         const welcomeMessage = chatWindow.querySelector('.system-message');
         if (welcomeMessage) {
@@ -69,7 +72,6 @@ function loadHistory() {
     }
     
     history.forEach(msg => {
-        // Відновлюємо повідомлення без повторного збереження
         createMessageElement(msg.content, msg.senderClass, true); 
     });
 }
@@ -78,7 +80,6 @@ function loadHistory() {
 // ⚙️ ІНШІ ФУНКЦІЇ (Лічильник та Активація)
 // -------------------------------------------------------------------
 
-// Функція оновлення лічильника
 function updateCounter() {
     let attempts = parseInt(localStorage.getItem('free_attempts') || '0');
     let remaining = MAX_FREE_ATTEMPTS - attempts;
@@ -130,9 +131,8 @@ generatorForm.addEventListener('submit', async (e) => {
     if (!prompt) return;
 
     const mode = aiModeSelect.value; 
-    // Клас для стилізації бульбашки AI
     const modeClass = mode !== 'generic' ? `mode-${mode}` : ''; 
-    const finalSenderClass = `ai-message ${modeClass}`; // Фінальний клас для AI-відповіді
+    const finalSenderClass = `ai-message ${modeClass}`; 
 
     const isActivated = localStorage.getItem('license_activated') === 'true';
     let attempts = parseInt(localStorage.getItem('free_attempts') || '0');
@@ -148,7 +148,7 @@ generatorForm.addEventListener('submit', async (e) => {
     promptInput.value = '';
 
     // 3. Індикатор завантаження
-    // Використовуємо modeClass для стилізації індикатора
+    // Використовуємо finalSenderClass для стилізації індикатора
     const loadingMessage = createMessageElement(`<span class="loading-dots">Generating...</span>`, finalSenderClass, true); 
     
     generateButton.disabled = true;
@@ -157,7 +157,6 @@ generatorForm.addEventListener('submit', async (e) => {
         const response = await fetch('/.netlify/functions/generate-text', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // Надсилаємо prompt і mode
             body: JSON.stringify({ prompt, mode }), 
         });
 
@@ -177,14 +176,16 @@ generatorForm.addEventListener('submit', async (e) => {
 
         // 5. Заміна індикатора на результат
         loadingMessage.innerHTML = `<p>${generatedText}</p><button class="copy-btn">Copy</button>`;
-        // Класи вже встановлені на кроці 3.
 
         // Зберігаємо фінальну відповідь AI в історію, використовуючи modeClass
-        saveMessage(generatedText, finalSenderClass); 
+        // saveMessage викликається через createMessageElement, але ми вже використали loadingMessage
+        // Тому просто переконуємося, що зберігаємо правильний клас
+        // Оскільки ми використовували loadingMessage для відображення, ми зберігаємо через saveMessage напряму
+        saveMessage(generatedText, finalSenderClass);
         
     } catch (error) {
         // Виведення помилки як системного повідомлення
-        loadingMessage.classList.remove('ai-message', `mode-${mode}`); // Видаляємо всі AI/Mode класи
+        loadingMessage.classList.remove(...finalSenderClass.split(' ')); // Видаляємо всі AI/Mode класи
         loadingMessage.innerHTML = `<p>❌ Error: ${error.message}. Please check API key and try again.</p>`;
         loadingMessage.classList.add('system-message', 'error');
         
