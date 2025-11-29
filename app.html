@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kairos AI | Advanced Assistant</title>
     <link rel="stylesheet" href="style.css">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
 
@@ -14,27 +20,28 @@
         <aside id="sidebar">
             <div class="sidebar-header">
                 <h3><span role="img" aria-label="star">✨</span> Kairos AI</h3>
-                <button id="new-chat-btn"><i class="fas fa-plus"></i> New Chat</button>
+                <button id="new-chat-btn" title="Start New Chat"><i class="fas fa-plus"></i> New Chat</button>
             </div>
 
             <div id="chat-history-list">
                 <div class="history-item active" data-chat-id="current">
-                    <i class="fas fa-comment"></i> New Conversation
-                </div>
+                    <i class="fas fa-comment"></i> <span>New Conversation</span>
+                    </div>
             </div>
 
             <div class="sidebar-footer">
                 <div id="subscription-status">
                     </div>
+                
                 <form id="key-form">
-                    <input type="text" id="license-key" placeholder="Enter Subscription Key">
-                    <button type="submit" class="activate-btn">Activate</button>
+                    <input type="text" id="license-key" placeholder="Enter Email/Key (Імітація)">
+                    <button type="submit" class="activate-btn">Login / Activate</button>
                 </form>
                 <p id="key-message"></p>
                 
                 <div class="user-info">
                     <i class="fas fa-user-circle"></i>
-                    <span>Guest User</span>
+                    <span>Guest User / Registered User (Імітація)</span>
                 </div>
             </div>
         </aside>
@@ -51,7 +58,7 @@
 
             <form id="generator-form">
                 <textarea id="prompt" required placeholder="Send a message..."></textarea>
-                <button type="submit" id="generate-button"><i class="fas fa-paper-plane"></i></button>
+                <button type="submit" id="generate-button" title="Send Message"><i class="fas fa-paper-plane"></i></button>
             </form>
         </main>
 

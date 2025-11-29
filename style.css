@@ -1,20 +1,20 @@
-/* --- Змінні та Основні Налаштування (Нова палітра з градієнтами) --- */
+/* --- Змінні та Основні Налаштування --- */
 :root {
     --background-dark: #0a0a0a;
-    --sidebar-bg: #1e1e1e; /* Фон для бічної панелі */
-    --main-bg: #222222; /* Фон для головного вікна чату */
+    --sidebar-bg: #1e1e1e;
+    --main-bg: #222222; 
     
-    /* Градієнти */
-    --primary-gradient: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); /* Фіолетово-синій */
+    --primary-gradient: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
     --sidebar-gradient: linear-gradient(180deg, #1e1e1e 0%, #0a0a0a 100%);
-    --send-button-color: #55aaff; /* Сучасний синій */
+    --send-button-color: #55aaff;
 
     --text-light: #e0e0e0;
     --text-dark: #ffffff;
-    --ai-bubble-background: #333333; /* Фон для повідомлень AI */
-    --user-bubble-background: var(--send-button-color); /* Синій для користувача */
+    --ai-bubble-background: #333333; 
+    --user-bubble-background: #007bff; /* Чистий синій для користувача */
     --border-color: #333333;
     --active-item: #3a3a3a;
+    --code-bg: #282c34; /* Фон для коду (Atom One Dark) */
 }
 
 /* Базові стилі */
@@ -51,7 +51,6 @@ body {
     padding: 15px;
     border-right: 1px solid var(--border-color);
 }
-
 .sidebar-header {
     padding: 10px 5px 20px;
     display: flex;
@@ -76,9 +75,6 @@ body {
     cursor: pointer;
     transition: background-color 0.2s;
 }
-#new-chat-btn:hover {
-    background-color: #4a4a4a;
-}
 
 /* Історія чатів */
 #chat-history-list {
@@ -88,6 +84,7 @@ body {
 }
 .history-item {
     display: flex;
+    justify-content: space-between; /* Розділяємо назву та кнопку */
     align-items: center;
     padding: 10px;
     margin-bottom: 5px;
@@ -98,6 +95,12 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.history-item span {
+    flex-grow: 1;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .history-item:hover {
     background-color: #2a2a2a;
 }
@@ -105,31 +108,32 @@ body {
     background-color: var(--active-item);
     font-weight: bold;
 }
-.history-item i {
+.history-item i:not(.delete-chat-btn) {
     margin-right: 10px;
     color: #999;
 }
+
+/* КНОПКА ВИДАЛЕННЯ */
+.delete-chat-btn {
+    color: #ff6347;
+    padding: 5px;
+    border-radius: 4px;
+    opacity: 0; /* Приховано за замовчуванням */
+    transition: opacity 0.2s;
+}
+.history-item:hover .delete-chat-btn {
+    opacity: 1; /* З'являється при наведенні */
+    background-color: #333;
+}
+.delete-chat-btn:hover {
+    background-color: #555 !important; 
+}
+
 
 /* Футер бічної панелі */
 .sidebar-footer {
     padding-top: 15px;
     border-top: 1px solid #333;
-}
-.user-info {
-    display: flex;
-    align-items: center;
-    padding-top: 10px;
-    font-size: 1.1em;
-}
-.user-info i {
-    margin-right: 10px;
-    color: #aaa;
-}
-
-/* --- Ключ/Підписка в сайдбарі --- */
-#subscription-status {
-    font-size: 0.9em;
-    padding-bottom: 10px;
 }
 #key-form {
     display: flex;
@@ -148,9 +152,15 @@ body {
     padding: 8px 10px;
     border: none;
     border-radius: 5px;
-    background-color: #4CAF50;
+    background: var(--send-button-color);
     color: white;
     cursor: pointer;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+    font-size: 1.1em;
 }
 
 
@@ -160,9 +170,9 @@ body {
     display: flex;
     flex-direction: column;
     background-color: var(--main-bg);
+    position: relative;
 }
 
-/* Інфо-бар під header (для лічильника) */
 #access-info-bar {
     padding: 10px 20px;
     text-align: center;
@@ -171,41 +181,25 @@ body {
     color: #ccc;
 }
 
-/* Вікно Чату */
+/* Вікно Чату та Повідомлення */
 #chat-window {
     flex-grow: 1;
     overflow-y: auto;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
     gap: 15px;
-    padding-bottom: 100px; /* Додатковий відступ для зони вводу */
+    padding-bottom: 100px;
 }
-
-/* Стилі скролбару */
-#chat-window::-webkit-scrollbar { width: 8px; }
-#chat-window::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
-#chat-window::-webkit-scrollbar-track { background: #333; }
-
-/* Стилі Повідомлень */
 .message {
     display: flex;
     margin-bottom: 5px;
     max-width: 800px;
     width: 100%;
-    animation: fadeIn 0.4s ease-out;
 }
 .ai-message {
     margin-right: auto;
     justify-content: flex-start;
-    display: flex; 
-    align-items: flex-end; 
+    display: block; /* Змінено на блок для кращого рендерингу коду */
 }
-.user-message {
-    margin-left: auto;
-    justify-content: flex-end;
-}
-
 .ai-message p, .user-message p {
     padding: 14px 20px;
     border-radius: 12px;
@@ -218,60 +212,79 @@ body {
 
 .user-message p {
     background-color: var(--user-bubble-background);
-    color: var(--text-dark); /* Білий текст на синьому */
+    color: var(--text-dark);
     border-bottom-right-radius: 4px;
 }
 
-.ai-message p {
+/* Стилі AI-повідомлення, включаючи код */
+.ai-message .ai-content-wrapper {
+    display: flex;
+    align-items: flex-end;
+}
+.ai-message .ai-content-wrapper p {
     background-color: var(--ai-bubble-background);
     color: var(--text-light);
     border-bottom-left-radius: 4px; 
     margin-right: 10px;
+    /* Видаляємо padding тут, якщо контент - це код */
 }
 
-.message.system-message {
-    max-width: 90%; 
-    margin: 15px auto; 
-    text-align: center;
-    color: #ffcc00; /* Жовтий для welcome */
-    font-weight: bold;
-    background-color: #3a3011;
-    border: 1px solid #7a6000;
-    padding: 10px;
+/* --- СТИЛІ КОДУ (MARKED.JS/HIGHLIGHT.JS) --- */
+
+/* Контейнер коду */
+.ai-message pre {
+    background-color: var(--code-bg);
     border-radius: 8px;
-}
-.message.system-message.error {
-    color: #ff6347;
-    background-color: #3d2222;
-    border-color: #8b0000;
+    padding: 0; /* Видаляємо стандартний padding pre */
+    margin: 10px 0;
+    overflow-x: auto;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Кнопка Копіювання */
+/* Сам код */
+.ai-message pre code {
+    padding: 15px;
+    display: block;
+    line-height: 1.4;
+    font-size: 0.95em;
+}
+
+/* Звичайний текст, коли є код */
+.ai-message .parsed-content p:not(:has(code)) {
+    background-color: var(--ai-bubble-background);
+    /* Забезпечуємо, що звичайний текст має правильну форму */
+    padding: 14px 20px; 
+    border-radius: 12px; 
+    margin: 0;
+}
+
+/* --- Кнопка Копіювання (для коду та тексту) --- */
 .copy-btn {
     background-color: #444; 
     color: white;
-    padding: 6px 12px;
+    padding: 6px 10px;
     font-size: 0.8em; 
     margin: 0; 
     border: none;
     cursor: pointer;
     border-radius: 4px;
-    display: block;
     height: fit-content; 
-    align-self: flex-end; 
+    align-self: flex-start; /* Вирівнюємо догори поруч з кодом/текстом */
     transition: background-color 0.2s;
 }
+
 
 /* --- Форма Вводу --- */
 #generator-form {
     display: flex;
     padding: 15px 20px;
     gap: 10px;
-    position: fixed; /* Фіксуємо внизу */
+    position: fixed; 
     bottom: 0;
-    left: 280px; /* Відступ на ширину сайдбару */
+    left: 280px; 
     right: 0;
-    max-width: 1120px; /* Макс. ширина основного контенту */
+    max-width: 1120px;
     background-color: var(--main-bg);
     border-top: 1px solid var(--border-color);
     box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
@@ -292,11 +305,6 @@ body {
     overflow-y: auto;
     transition: all 0.2s ease;
 }
-#prompt:focus {
-    border-color: var(--send-button-color); 
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(85, 170, 255, 0.2);
-}
 
 #generate-button {
     width: 50px;
@@ -307,27 +315,12 @@ body {
     color: white;
     cursor: pointer;
     font-size: 1.1em;
-    transition: background-color 0.2s;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-#generate-button:hover {
-    background-color: #4499ff;
-}
-#generate-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background-color: #555;
-}
 
-/* Анімації */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Мобільні налаштування (бічна панель зникає) */
+/* Мобільні налаштування */
 @media (max-width: 900px) {
     #sidebar {
         display: none;
@@ -336,12 +329,12 @@ body {
         border-radius: 0;
     }
     #generator-form {
-        left: 0; /* Форма займає всю ширину */
+        left: 0; 
         right: 0;
         max-width: none;
         padding: 10px;
     }
     #chat-window {
-        padding-bottom: 80px; /* Зменшуємо нижній відступ */
+        padding-bottom: 80px; 
     }
 }

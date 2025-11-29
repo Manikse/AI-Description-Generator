@@ -1,24 +1,17 @@
-// netlify/functions/generate-text.js (ЗАЛИШАЄТЬСЯ ЯК У ПОПЕРЕДНЬОМУ ПОВІДОМЛЕННІ)
+// netlify/functions/generate-text.js
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'; 
-const MODEL = "openai/gpt-3.5-turbo"; // Або будь-яка інша потужна модель на OpenRouter
+const MODEL = "openai/gpt-4o"; // Підвищуємо модель для кращої генерації коду (або gpt-3.5-turbo, якщо gpt-4o надто дорога)
 
 const KAIROS_SYSTEM_INSTRUCTION = `You are Kairos AI, an advanced, intelligent, and helpful AI assistant designed to perform tasks better than ChatGPT. You are highly versatile and can understand and generate content on a wide range of topics, formats, and styles.
-Your capabilities include, but are not limited to:
-- Writing creative content (stories, poems, scripts, code)
-- Summarizing complex information
-- Answering questions across various domains
-- Generating different types of text formats (emails, social media posts, slogans, articles)
-- Providing explanations and tutorials
-- Engaging in natural, coherent conversations.
+Your core capabilities include:
+1.  **Code Generation:** When asked for code (Python, JavaScript, HTML, CSS, bash, etc.), you MUST provide it inside **Markdown Code Blocks** (use triple backticks \`\`\` and specify the language).
+2.  **Detailed Explanation:** Provide comprehensive, accurate, and creative answers.
+3.  **Adaptability:** Adjust your style and tone to the user's request.
 
-Your responses should be:
+Your responses must be:
 - **Comprehensive:** Provide thorough and complete answers.
-- **Accurate:** Ensure factual correctness.
-- **Creative:** Offer innovative and engaging content when appropriate.
-- **User-friendly:** Be clear, concise, and easy to understand.
-- **Adaptable:** Adjust your style and tone to the user's request.
-- **CRITICAL:** Respond ONLY with the generated text in the same language as the user's request. Do NOT include any introductory or concluding phrases like "Here is...", "I can help with...", "Hope this helps!", or conversational filler that is not part of the direct answer. Focus on delivering the requested content directly.`;
+- **CRITICAL:** Respond ONLY with the generated text. Do NOT include any introductory or concluding phrases like "Here is...", "I can help with...", "Hope this helps!", or conversational filler that is not part of the direct answer. Focus on delivering the requested content directly. Use Markdown for formatting, especially for code.`;
 
 
 exports.handler = async (event) => {
@@ -34,7 +27,7 @@ exports.handler = async (event) => {
         if (!apiKey) {
             return {
                 statusCode: 500,
-                body: JSON.stringify({ error: 'Server Error: API Key (AI_GENERATOR or OPENROUTER_API_KEY) is missing or undefined in Netlify settings.' }),
+                body: JSON.stringify({ error: 'Server Error: API Key is missing.' }),
             };
         }
 
@@ -52,8 +45,8 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 model: MODEL,
                 messages: messages, 
-                max_tokens: 1000, 
-                temperature: 0.8,
+                max_tokens: 1500, // Збільшуємо токени для коду
+                temperature: 0.7, // Знижуємо температуру для більшої точності коду
             }),
         });
 
